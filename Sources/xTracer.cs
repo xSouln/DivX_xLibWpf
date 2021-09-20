@@ -18,7 +18,7 @@ namespace xLib
             {
                 PointEntryUI?.Invoke((RequestUI) =>
                 {
-                    if (Notes.Count > 2000) Notes.RemoveAt(Notes.Count - 1);
+                    if (Notes.Count > 500) Notes.RemoveAt(Notes.Count - 1);
 
                     Notes.Insert(0, new ReceivePacketInfo
                     {

@@ -31,7 +31,8 @@ namespace xLib
         BUSY,
         OUTSIDE,
         ERROR_ACTION,
-        ERROR_POSITION
+        ERROR_POSITION,
+        COUNT
     }
     public struct xContent { public unsafe byte* Obj; public int Size; }
 
