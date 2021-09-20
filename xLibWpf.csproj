@@ -99,7 +99,6 @@
     <Compile Include="Sources\xTcp.cs" />
     <Compile Include="Sources\xTracer.cs" />
     <Compile Include="Sources\xTypedef.cs" />
-    <Compile Include="UI_Propertys\UI_Background.cs" />
     <Compile Include="UI_Propertys\UI_Button.cs" />
     <Compile Include="UI_Propertys\UI_FProperty.cs" />
     <Compile Include="UI_Propertys\UI_LoaderHandler.cs" />

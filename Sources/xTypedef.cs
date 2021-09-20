@@ -56,6 +56,7 @@ namespace xLib
         }
     }
 
+    public interface IResponseInfo { ushort Action { get; set; } ushort Size { get; set; } }
     public interface IResponseAction { ushort Action { get; set; } }
     public struct ResponseInfoT : IResponseAction, IDataProvider
     {

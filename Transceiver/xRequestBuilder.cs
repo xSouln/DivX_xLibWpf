@@ -82,7 +82,7 @@ namespace xLib.Transceiver
         }
     }
 
-    public class xRequestBuilder<TResponse, TRequestInfo> : xRequestBuilderBase, IRequestInfo<TRequestInfo> where TRequestInfo : unmanaged, IRequestInfo where TResponse : xResponse
+    public class xRequestBuilder<TResponse, TRequestInfo> : xRequestBuilderBase where TRequestInfo : IDataProvider, IRequestInfo where TResponse : xResponse
     {
         public TRequestInfo Info { get; set; }
         public new TResponse Response { get { return (TResponse)response; } set { response = value; } }
@@ -91,11 +91,11 @@ namespace xLib.Transceiver
         {
             xRequest RequestPacket = new xRequest { Response = Response, Builder = this };
             List<byte> request_data = new List<byte>();
-            TRequestInfo info = Info;
-            info.Size = (ushort)obj_size;
 
             add_data(request_data, Header);
-            add_data(request_data, &info, sizeof(TRequestInfo));
+            Info.Size = (ushort)obj_size;
+            Info.GetData(request_data);
+            //add_data(request_data, &info, sizeof(TRequestInfo));
             add_data(request_data, obj, obj_size);
             add_data(request_data, End);
             RequestPacket.Data = request_data.ToArray();
@@ -106,18 +106,18 @@ namespace xLib.Transceiver
         {
             xRequest RequestPacket = new xRequest { Response = Response, Builder = this };
             List<byte> request_data = new List<byte>();
-            TRequestInfo info = Info;
-            info.Size = 0;
 
             add_data(request_data, Header);
-            add_data(request_data, &info, sizeof(TRequestInfo));
+            Info.Size = 0;
+            Info.GetData(request_data);
+            //add_data(request_data, &info, sizeof(TRequestInfo));
             add_data(request_data, End);
             RequestPacket.Data = request_data.ToArray();
             return RequestPacket;
         }
     }
 
-    public class xRequestBuilder<TResponse, TRequestInfo, TRequest> : xRequestBuilderBase, IRequestInfo<TRequestInfo> where TRequest : unmanaged where TResponse : xResponse where TRequestInfo : unmanaged, IRequestInfo
+    public class xRequestBuilder<TResponse, TRequestInfo, TRequest> : xRequestBuilderBase where TRequest : unmanaged where TResponse : xResponse where TRequestInfo : IDataProvider, IRequestInfo
     {
         public TRequestInfo Info { get; set; }
         public new TResponse Response { get { return (TResponse)response; } set { response = value; } }
@@ -130,7 +130,9 @@ namespace xLib.Transceiver
             info.Size = (ushort)sizeof(TRequest);
 
             add_data(request_data, Header);
-            add_data(request_data, &info, sizeof(TRequestInfo));
+            Info.Size = (ushort)sizeof(TRequest);
+            Info.GetData(request_data);
+            //add_data(request_data, &info, sizeof(TRequestInfo));
             add_data(request_data, &request, sizeof(TRequest));
             add_data(request_data, End);
             RequestPacket.Data = request_data.ToArray();
