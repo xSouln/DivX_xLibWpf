@@ -4,6 +4,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using xLib.Transceiver;
 
 namespace xLib
 {
@@ -37,17 +38,40 @@ namespace xLib
     public struct xContent { public unsafe byte* Obj; public int Size; }
 
     public interface IRequestInfo { ushort Action { get; set; } ushort Size { get; set; } }
-    public struct RequestInfoT : IRequestInfo
+    public struct RequestInfoT : IRequestInfo, IDataProvider
     {
         public ushort Action { get; set; }
         public ushort Size { get; set; }
+
+        public unsafe int GetSize() => sizeof(RequestInfoT);
+
+        public void GetData(List<byte> data)
+        {
+            unsafe
+            {
+                RequestInfoT total = this;
+                byte* ptr = (byte*)&total;
+                for (int i = 0; i < sizeof(ResponseInfoT); i++) { data.Add(ptr[i]); }
+            }
+        }
     }
 
     public interface IResponseAction { ushort Action { get; set; } }
-    public struct ResponseInfoT : IResponseAction
+    public struct ResponseInfoT : IResponseAction, IDataProvider
     {
         public ushort Action { get; set; }
         public ushort Size { get; set; }
+        public unsafe int GetSize() => sizeof(RequestInfoT);
+
+        public void GetData(List<byte> data)
+        {
+            unsafe
+            {
+                ResponseInfoT total = this;
+                byte* ptr = (byte*)&total;
+                for (int i = 0; i < sizeof(ResponseInfoT); i++) { data.Add(ptr[i]); }
+            }
+        }
     }
 
     public interface IResponseError { ushort Error { get; set; } }

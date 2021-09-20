@@ -62,9 +62,9 @@ namespace xLib.UI_Propertys
         protected Brush background_request;
 
         public object Content;
-        public xEventChanged<UI_Property> EventSelectionChanged;
-        public xEventChanged<UI_Property> EventChangedValue;
-        public xEventChanged<UI_Property> EventChangedRequest;
+        public xEvent<UI_Property> EventSelectionChanged;
+        public xEvent<UI_Property> EventChangedValue;
+        public xEvent<UI_Property> EventChangedRequest;
         public xBackgroundRule<UI_Property> BackgroundValueRule;
         public xBackgroundRule<UI_Property> BackgroundRequestRule;
 
@@ -187,9 +187,9 @@ namespace xLib.UI_Propertys
             _request = default(TValue);
         }
 
-        public new xEventChanged<UI_Property<TValue>> EventSelectionChanged;
-        public new xEventChanged<UI_Property<TValue>> EventChangedValue;
-        public new xEventChanged<UI_Property<TValue>> EventChangedRequest;
+        public new xEvent<UI_Property<TValue>> EventSelectionChanged;
+        public new xEvent<UI_Property<TValue>> EventChangedValue;
+        public new xEvent<UI_Property<TValue>> EventChangedRequest;
         public new xBackgroundRule<UI_Property<TValue>> BackgroundValueRule;
         public new xBackgroundRule<UI_Property<TValue>> BackgroundRequestRule;
 
@@ -248,9 +248,9 @@ namespace xLib.UI_Propertys
             _request = default(TRequest);
         }
 
-        public new xEventChanged<UI_Property<TValue, TRequest>> EventSelectionChanged;
-        public new xEventChanged<UI_Property<TValue, TRequest>> EventChangedValue;
-        public new xEventChanged<UI_Property<TValue, TRequest>> EventChangedRequest;
+        public new xEvent<UI_Property<TValue, TRequest>> EventSelectionChanged;
+        public new xEvent<UI_Property<TValue, TRequest>> EventChangedValue;
+        public new xEvent<UI_Property<TValue, TRequest>> EventChangedRequest;
         public new xBackgroundRule<UI_Property<TValue, TRequest>> BackgroundValueRule;
         public new xBackgroundRule<UI_Property<TValue, TRequest>> BackgroundRequestRule;
 

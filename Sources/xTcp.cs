@@ -87,7 +87,7 @@ namespace xLib
 
         private bool thread_close()
         {
-            if(stream != null) { stream.Flush(); stream.Close(); stream = null; }
+            if (stream != null) { stream.Flush(); stream.Close(); stream = null; }
             if (client != null) { client.Client?.Close(); client.Close(); client = null; }
             server_thread?.Abort();
             server_thread = null;

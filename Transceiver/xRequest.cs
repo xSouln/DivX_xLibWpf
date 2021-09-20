@@ -22,9 +22,6 @@ namespace xLib.Transceiver
 
     public class xRequest : IRequestControl
     {
-        //public delegate bool DTransmitter(byte[] data);
-        public delegate void DTimeOut<TRequest>(TRequest request);
-
         public xRequest() { }
 
         public xRequest(xRequest request)
@@ -36,7 +33,7 @@ namespace xLib.Transceiver
         }
 
         protected xAction<bool, byte[]> transmitter;
-        protected DTimeOut<xRequest> EventTimeOut;
+        protected xEvent<xRequest> EventTimeOut;
         protected bool is_transmit = false;
         protected bool complite = false;
         protected int try_count = 1;

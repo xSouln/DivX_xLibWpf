@@ -9,7 +9,8 @@ namespace xLib.Transceiver
 {
     public interface IDataProvider
     {
-        unsafe byte[] GetData();
+        int GetSize();
+        void GetData(List<byte> data);
     }
 
     public abstract class xRequestBuilderBase : NotifyPropertyChanged
@@ -136,10 +137,4 @@ namespace xLib.Transceiver
             return RequestPacket;
         }
     }
-    /*
-    public class xRequestBuilder<TResponse, TRequestPacket> : xRequestBuilder where TResponse : xResponse where TRequestPacket : xRequestPacket
-    {
-       
-    }
-    */
 }

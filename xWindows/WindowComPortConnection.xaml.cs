@@ -47,11 +47,6 @@ namespace xLib
             SerialPort.Disconnect();
         }
 
-        private void BaudRateBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            if (BaudRateBox.SelectedIndex != -1) { SerialPort.BoadRate = (int)BaudRateBox.Items[BaudRateBox.SelectedIndex]; }
-        }
-
         private void TransmitBut_Click(object sender, RoutedEventArgs e)
         {
             if (TransmitDataTextBox.Text.Length > 0) { SerialPort.Send(TransmitDataTextBox.Text); }
