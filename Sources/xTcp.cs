@@ -29,14 +29,12 @@ namespace xLib
         public bool is_connected = false;
         public int UpdatePeriod = 1;
 
-        public xReceiver xRx;
+        public xReceiver Receiver;
         private void trace(string note) { Tracer?.Invoke(note); xTracer.Message(note); }
 
         public xTcp()
         {
             Background = UI_Property.RED;
-            xRx = new xReceiver(10000, new byte[] { (byte)'\r' });
-            xRx.Clear();
         }
 
         public object Background
@@ -72,14 +70,14 @@ namespace xLib
 
                 int count = 0;
                 byte[] buf = new byte[100000];
-                xRx.Clear();
+                Receiver.Clear();
 
                 while (true)
                 {
                     do
                     {
                         count = stream.Read(buf, 0, buf.Length);
-                        if (count > 0) { for (int i = 0; i < count; i++) xRx.Add(buf[i]); }
+                        if (count > 0) { for (int i = 0; i < count; i++) Receiver.Add(buf[i]); }
                     }
                     while ((bool)stream?.DataAvailable);
                 }
@@ -89,13 +87,8 @@ namespace xLib
 
         private bool thread_close()
         {
-            if (stream != null) { stream.Flush(); stream.Close(); stream = null; }
-            if (client != null)
-            {
-                client.Client?.Close();
-                client.Close();
-                client = null;
-            }
+            if(stream != null) { stream.Flush(); stream.Close(); stream = null; }
+            if (client != null) { client.Client?.Close(); client.Close(); client = null; }
             server_thread?.Abort();
             server_thread = null;
             trace("tcp: thread close");
