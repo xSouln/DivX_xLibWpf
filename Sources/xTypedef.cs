@@ -21,20 +21,6 @@ namespace xLib
 
     public delegate void xEventChangeState<TObject, TState>(TObject obj, TState state);
 
-    public enum EErrors : byte
-    {
-        ACCEPT = 0,
-        ERROR_DATA,
-        ERROR_CONTENT_SIZE,
-        ERROR_REQUEST,
-        ERROR_RESOLUTION,
-        UNKNOWN_COMMAND,
-        BUSY,
-        OUTSIDE,
-        ERROR_ACTION,
-        ERROR_POSITION,
-        COUNT
-    }
     public struct xContent { public unsafe byte* Obj; public int Size; }
 
     public interface IRequestInfo { ushort Action { get; set; } ushort Size { get; set; } }

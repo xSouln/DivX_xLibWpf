@@ -37,8 +37,6 @@ namespace xLib.UI_Propertys
 
     public class UI_Property : NotifyPropertyChanged, IUI_PropertyValue<object>, IUI_PropertyRequest<object>
     {
-        public delegate void xEventChanged<TProperty>(TProperty property);
-        public delegate void xEventBackgroundChanged<TProperty>(TProperty property);
         public delegate Brush xBackgroundRule<TProperty>(TProperty property);
 
         protected string name = "";
@@ -56,8 +54,8 @@ namespace xLib.UI_Propertys
         public static Brush YELLOW = (Brush)new BrushConverter().ConvertFrom("#FF724C21");
         public static Brush TRANSPARENT = null;
 
-        //public Brush BackgroundFalse = (Brush)new BrushConverter().ConvertFrom("#FF641818");
-        //public Brush BackgroundTrue = (Brush)new BrushConverter().ConvertFrom("#FF21662A");
+        protected Visibility visibility_value = Visibility.Visible;
+        protected Visibility visibility_request = Visibility.Visible;
         protected Brush background_value;
         protected Brush background_request;
 
@@ -110,6 +108,24 @@ namespace xLib.UI_Propertys
         {
             set { background_request = value; OnPropertyChanged(nameof(BackgroundRequest)); }
             get { return background_request; }
+        }
+
+        public Visibility VisibilityValue
+        {
+            get { return visibility_value; }
+            set { visibility_value = value; OnPropertyChanged(nameof(VisibilityValue)); }
+        }
+
+        public Visibility VisibilityRequest
+        {
+            get { return visibility_request; }
+            set { visibility_request = value; OnPropertyChanged(nameof(VisibilityRequest)); }
+        }
+
+        public virtual int Code
+        {
+            get { return code; }
+            set { code = value; OnPropertyChanged(nameof(Code)); }
         }
 
         public virtual object Value

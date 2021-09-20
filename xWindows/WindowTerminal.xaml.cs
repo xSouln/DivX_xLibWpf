@@ -23,6 +23,9 @@ namespace xLib
         private static WindowTerminal window;
         private static ObservableCollection<ReceivePacketInfo> note_info;
         private static ObservableCollection<ReceivePacketInfo> note_loge;
+
+        public static xAction<bool, byte[]> Transmitter;
+
         public WindowTerminal()
         {
             InitializeComponent();

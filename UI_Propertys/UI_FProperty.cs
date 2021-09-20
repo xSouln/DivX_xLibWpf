@@ -55,7 +55,7 @@ namespace xLib.UI_Propertys
         protected bool is_writable = false;
 
         public object Content;
-        public ActionAccessUI PointEntryUI;
+        public ActionAccessUI<object> PointEntryUI;
         public xParseRull<string> ParseRull;
 
         public virtual string Name

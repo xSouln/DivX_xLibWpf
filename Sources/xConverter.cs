@@ -36,6 +36,13 @@ namespace xLib
             return true;
         }
 
+        public static bool Compare(string str, xContent content)
+        {
+            if (str == null || str.Length <= 0 || str.Length > content.Size) { return false; }
+            unsafe { foreach (byte ch in str) { if (ch != *content.Obj) { return false; } content.Obj++; } }
+            return true;
+        }
+
         public static unsafe bool Compare(byte[] data1, void *data2, int data_len)
         {
             byte* ptr = (byte*)data2;
