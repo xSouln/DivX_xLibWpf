@@ -17,13 +17,28 @@ namespace xLib.Transceiver
         TResponseInfo Info { get; set; }
     }
 
+    public interface IContentSeter
+    {
+        object SetContent(xContent content);
+    }
+
+    public unsafe class xResponseContentUnmanaged<TContent> : IContentSeter where TContent : unmanaged
+    {
+        public TContent *Obj;
+        public xContent Content;
+
+        public xResponseContentUnmanaged() { }
+        public xResponseContentUnmanaged(xContent content) { Content = content; Obj = (TContent*)content.Obj; }
+        public object SetContent(xContent content) { Content = content; Obj = (TContent*)content.Obj; return this; }
+    }
+
     public class xResponse : NotifyPropertyChanged, IResponseControl
     {
         public const char START_CHARECTER = '#';
         public class ParseCallback { public xContent Content; }
 
         public unsafe delegate ParseCallback DParseRule<TResponse>(TResponse response, xContent content);
-        public unsafe delegate bool DReceiver<TRequest, TContent>(TRequest request, xContent content, TContent* obj) where TContent : unmanaged;
+        public unsafe delegate bool DReceiver<TResponse, TContent>(TResponse response, TContent packet) where TContent : IContentSeter, new();
 
         public xResponse() { }
         public xResponse(xResponse response)
@@ -38,7 +53,7 @@ namespace xLib.Transceiver
         protected string header = "";
 
         public DParseRule<xResponse> ParseRule;
-        public DReceiver<xResponse, byte> EventReceive;
+        public DReceiver<xResponse, xResponseContentUnmanaged<byte>> EventReceive;
         public xEvent Tracer;
 
         public virtual string Name
@@ -62,10 +77,10 @@ namespace xLib.Transceiver
             return false;
         }
 
-        public unsafe virtual void Receive(xContent content) { Tracer?.Invoke("Receive" + name); EventReceive?.Invoke(this, content, content.Obj); }
+        public unsafe virtual void Receive(xContent content) { Tracer?.Invoke("Receive" + name); EventReceive?.Invoke(this, new xResponseContentUnmanaged<byte>(content)); }
     }
 
-    public class xResponse<TContent> : xResponse where TContent : unmanaged
+    public class xResponse<TContent> : xResponse where TContent : IContentSeter, new()
     {
         public new DParseRule<xResponse<TContent>> ParseRule;
         public new DReceiver<xResponse<TContent>, TContent> EventReceive;
@@ -75,17 +90,17 @@ namespace xLib.Transceiver
             if (ParseRule != null)
             {
                 ParseCallback callback = ParseRule(this, content);
-                if (callback != null) { return (bool)(EventReceive?.Invoke(this, callback.Content, (TContent*)callback.Content.Obj)); }
+                if (callback != null) { return (bool)(EventReceive?.Invoke(this, (TContent)new TContent().SetContent(callback.Content))); }
             }
             return false;
         }
 
-        public unsafe override void Receive(xContent content) { Tracer?.Invoke("Receive" + name); EventReceive?.Invoke(this, content, (TContent*)content.Obj); }
+        public unsafe override void Receive(xContent content) { Tracer?.Invoke("Receive" + name); EventReceive?.Invoke(this, (TContent)new TContent().SetContent(content)); }
     }
 
-    public class xResponse<TContent, TResponseInfo> : xResponse, IResponseAction, IResponseInfo<TResponseInfo> where TContent : unmanaged where TResponseInfo : unmanaged, IResponseAction
+    public class xResponse<TContent, TResponseInfo> : xResponse, IResponseAction where TContent : IContentSeter, new() where TResponseInfo : unmanaged, IResponseAction
     {
-        public TResponseInfo Info { get; set; }
+        public TResponseInfo Info;
         public ushort Action { get { return Info.Action; } set { } }
 
         public new DParseRule<xResponse<TContent, TResponseInfo>> ParseRule;
@@ -96,11 +111,11 @@ namespace xLib.Transceiver
             if (ParseRule != null)
             {
                 ParseCallback callback = ParseRule(this, content);
-                if (callback != null) { return (bool)(EventReceive?.Invoke(this, callback.Content, (TContent*)callback.Content.Obj)); }
+                if (callback != null) { return (bool)(EventReceive?.Invoke(this, (TContent)new TContent().SetContent(callback.Content))); }
             }
             return false;
         }
 
-        public override unsafe void Receive(xContent content) { Tracer?.Invoke("Receive" + name); EventReceive?.Invoke(this, content, (TContent*)content.Obj); }
+        public override unsafe void Receive(xContent content) { Tracer?.Invoke("Receive" + name); EventReceive?.Invoke(this, (TContent)new TContent().SetContent(content)); }
     }
 }
