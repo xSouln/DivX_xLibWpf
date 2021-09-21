@@ -44,6 +44,7 @@ namespace xLib
         public ushort Size { get; set; }
 
         public unsafe int GetSize() => sizeof(RequestInfoT);
+        public void SetSize(int size) { Size = (ushort)size; }
 
         public void GetData(List<byte> data)
         {
@@ -63,6 +64,7 @@ namespace xLib
         public ushort Action { get; set; }
         public ushort Size { get; set; }
         public unsafe int GetSize() => sizeof(RequestInfoT);
+        public void SetSize(int size) { Size = (ushort)size; }
 
         public void GetData(List<byte> data)
         {

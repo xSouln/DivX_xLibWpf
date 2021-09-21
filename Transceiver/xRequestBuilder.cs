@@ -10,6 +10,7 @@ namespace xLib.Transceiver
     public interface IDataProvider
     {
         int GetSize();
+        void SetSize(int size);
         void GetData(List<byte> data);
     }
 
@@ -84,7 +85,7 @@ namespace xLib.Transceiver
 
     public class xRequestBuilder<TResponse, TRequestInfo> : xRequestBuilderBase where TRequestInfo : IDataProvider, IRequestInfo where TResponse : xResponse
     {
-        public TRequestInfo Info { get; set; }
+        public TRequestInfo Info;
         public new TResponse Response { get { return (TResponse)response; } set { response = value; } }
 
         public virtual unsafe xRequest Prepare(void* obj, int obj_size)
@@ -93,9 +94,10 @@ namespace xLib.Transceiver
             List<byte> request_data = new List<byte>();
 
             add_data(request_data, Header);
+
             Info.Size = (ushort)obj_size;
             Info.GetData(request_data);
-            //add_data(request_data, &info, sizeof(TRequestInfo));
+
             add_data(request_data, obj, obj_size);
             add_data(request_data, End);
             RequestPacket.Data = request_data.ToArray();
@@ -108,33 +110,35 @@ namespace xLib.Transceiver
             List<byte> request_data = new List<byte>();
 
             add_data(request_data, Header);
+
             Info.Size = 0;
             Info.GetData(request_data);
-            //add_data(request_data, &info, sizeof(TRequestInfo));
+
             add_data(request_data, End);
             RequestPacket.Data = request_data.ToArray();
+
             return RequestPacket;
         }
     }
 
     public class xRequestBuilder<TResponse, TRequestInfo, TRequest> : xRequestBuilderBase where TRequest : unmanaged where TResponse : xResponse where TRequestInfo : IDataProvider, IRequestInfo
     {
-        public TRequestInfo Info { get; set; }
+        public TRequestInfo Info;
         public new TResponse Response { get { return (TResponse)response; } set { response = value; } }
 
         public unsafe xRequest Prepare(TRequest request)
         {
             xRequest RequestPacket = new xRequest { Response = Response, Builder = this };
             List<byte> request_data = new List<byte>();
-            TRequestInfo info = Info;
-            info.Size = (ushort)sizeof(TRequest);
 
             add_data(request_data, Header);
+
             Info.Size = (ushort)sizeof(TRequest);
             Info.GetData(request_data);
-            //add_data(request_data, &info, sizeof(TRequestInfo));
+
             add_data(request_data, &request, sizeof(TRequest));
             add_data(request_data, End);
+
             RequestPacket.Data = request_data.ToArray();
             return RequestPacket;
         }
