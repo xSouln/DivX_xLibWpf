@@ -13,7 +13,7 @@ namespace xLib.UI_Propertys
 {
     public interface IUI_PropertyEvents
     {
-        void SelectionChanged();
+        void Select();
     }
 
     public interface IUI_PropertyValue<TValue>
@@ -35,7 +35,7 @@ namespace xLib.UI_Propertys
         }
     }
 
-    public class UI_Property : NotifyPropertyChanged, IUI_PropertyValue<object>, IUI_PropertyRequest<object>
+    public class UI_Property : NotifyPropertyChanged
     {
         public delegate void xEventChanged<TProperty>(TProperty property);
         public delegate void xEventBackgroundChanged<TProperty>(TProperty property);
@@ -51,6 +51,9 @@ namespace xLib.UI_Propertys
         protected object _value;
         protected object _request;
 
+        protected Visibility visibility_value = Visibility.Visible;
+        protected Visibility visibility_request = Visibility.Visible;
+
         public static Brush RED = (Brush)new BrushConverter().ConvertFrom("#FF641818");
         public static Brush GREEN = (Brush)new BrushConverter().ConvertFrom("#FF21662A");
         public static Brush YELLOW = (Brush)new BrushConverter().ConvertFrom("#FF724C21");
@@ -63,8 +66,9 @@ namespace xLib.UI_Propertys
 
         public object Content;
         public xEvent<UI_Property> EventSelectionChanged;
-        public xEvent<UI_Property> EventChangedValue;
-        public xEvent<UI_Property> EventChangedRequest;
+        public xEvent<UI_Property> EventClick;
+        public xEvent<UI_Property> EventValueChanged;
+        public xEvent<UI_Property> EventRequestChanged;
         public xBackgroundRule<UI_Property> BackgroundValueRule;
         public xBackgroundRule<UI_Property> BackgroundRequestRule;
 
@@ -112,6 +116,18 @@ namespace xLib.UI_Propertys
             get { return background_request; }
         }
 
+        public Visibility VisibilityValue
+        {
+            get { return visibility_value; }
+            set { visibility_value = value; OnPropertyChanged(nameof(VisibilityValue)); }
+        }
+
+        public Visibility VisibilityRequest
+        {
+            get => _request == null ? Visibility.Collapsed : visibility_request;
+            set { visibility_request = value; OnPropertyChanged(nameof(VisibilityRequest)); }
+        }
+
         public virtual object Value
         {
             get { return _value; }
@@ -121,7 +137,7 @@ namespace xLib.UI_Propertys
                 {
                     _value = value;
                     OnPropertyChanged(nameof(Value));
-                    EventChangedValue?.Invoke(this);
+                    EventValueChanged?.Invoke(this);
                     BackgroundValue = BackgroundValueRule?.Invoke(this);
 
                     foreach (ManualResetEvent alement in wait_handler) { alement.Set(); }
@@ -139,13 +155,13 @@ namespace xLib.UI_Propertys
                 {
                     _request = value;
                     OnPropertyChanged(nameof(Request));
-                    EventChangedRequest?.Invoke(this);
+                    EventRequestChanged?.Invoke(this);
                     BackgroundRequest = BackgroundRequestRule?.Invoke(this);
                 }
             }
         }
 
-        public virtual void BackgroundsUpdate()
+        public virtual void Update()
         {
             BackgroundRequest = BackgroundRequestRule?.Invoke(this);
             BackgroundValue = BackgroundValueRule?.Invoke(this);
@@ -175,25 +191,20 @@ namespace xLib.UI_Propertys
             return await Task.Run(() => wait_value_state(this, state, time));
         }
 
-        public virtual void SelectionChanged() { EventSelectionChanged?.Invoke(this); }
-        public static void SelectionChanged(IUI_PropertyEvents events) { events.SelectionChanged(); }
+        public virtual void Select() { EventSelectionChanged?.Invoke(this); }
     }
 
-    public class UI_Property<TValue> : UI_Property, IUI_PropertyEvents, IUI_PropertyValue<TValue>, IUI_PropertyRequest<TValue>
+    public class UI_Property<TValue> : UI_Property, IUI_PropertyEvents
     {
-        public UI_Property()
-        {
-            _value = default(TValue);
-            _request = default(TValue);
-        }
+        public UI_Property() { _value = default(TValue); _request = default(TValue); }
 
         public new xEvent<UI_Property<TValue>> EventSelectionChanged;
-        public new xEvent<UI_Property<TValue>> EventChangedValue;
-        public new xEvent<UI_Property<TValue>> EventChangedRequest;
+        public new xEvent<UI_Property<TValue>> EventValueChanged;
+        public new xEvent<UI_Property<TValue>> EventRequestChanged;
         public new xBackgroundRule<UI_Property<TValue>> BackgroundValueRule;
         public new xBackgroundRule<UI_Property<TValue>> BackgroundRequestRule;
 
-        public new TValue Value
+        public TValue Value
         {
             set
             {
@@ -201,7 +212,7 @@ namespace xLib.UI_Propertys
                 {
                     _value = value;
                     OnPropertyChanged(nameof(Value));
-                    EventChangedValue?.Invoke(this);
+                    EventValueChanged?.Invoke(this);
                     BackgroundValue = BackgroundValueRule?.Invoke(this);
 
                     foreach (ManualResetEvent alement in wait_handler) { alement.Set(); }
@@ -211,7 +222,7 @@ namespace xLib.UI_Propertys
             get { return (TValue)_value; }
         }
 
-        public new TValue Request
+        public TValue Request
         {
             set
             {
@@ -219,42 +230,35 @@ namespace xLib.UI_Propertys
                 {
                     _request = value;
                     OnPropertyChanged(nameof(Request));
-                    EventChangedRequest?.Invoke(this);
+                    EventRequestChanged?.Invoke(this);
                     BackgroundRequest = BackgroundRequestRule?.Invoke(this);
                 }
             }
             get { return (TValue)_request; }
         }
 
-        public override void BackgroundsUpdate()
+        public override void Update()
         {
             BackgroundRequest = BackgroundRequestRule?.Invoke(this);
             BackgroundValue = BackgroundValueRule?.Invoke(this);
         }
 
-        public async Task<TValue> WaitValue(TValue state, int time)
-        {
-            return (TValue)await Task.Run(() => wait_value_state(this, state, time));
-        }
+        public async Task<TValue> WaitValue(TValue state, int time) { return (TValue)await Task.Run(() => wait_value_state(this, state, time)); }
 
-        public override void SelectionChanged() { EventSelectionChanged?.Invoke(this); }
+        public override void Select() { EventSelectionChanged?.Invoke(this); }
     }
 
-    public class UI_Property<TValue, TRequest> : UI_Property, IUI_PropertyEvents, IUI_PropertyValue<TValue>, IUI_PropertyRequest<TRequest> where TValue : IComparable where TRequest : IComparable
+    public class UI_Property<TValue, TRequest> : UI_Property, IUI_PropertyEvents where TValue : IComparable// where TRequest : IComparable
     {
-        public UI_Property()
-        {
-            _value = default(TValue);
-            _request = default(TRequest);
-        }
+        public UI_Property() { _value = default(TValue); _request = default(TRequest); }
 
         public new xEvent<UI_Property<TValue, TRequest>> EventSelectionChanged;
-        public new xEvent<UI_Property<TValue, TRequest>> EventChangedValue;
-        public new xEvent<UI_Property<TValue, TRequest>> EventChangedRequest;
+        public new xEvent<UI_Property<TValue, TRequest>> EventValueChanged;
+        public new xEvent<UI_Property<TValue, TRequest>> EventRequestChanged;
         public new xBackgroundRule<UI_Property<TValue, TRequest>> BackgroundValueRule;
         public new xBackgroundRule<UI_Property<TValue, TRequest>> BackgroundRequestRule;
 
-        public new TValue Value
+        public TValue Value
         {
             set
             {
@@ -262,7 +266,7 @@ namespace xLib.UI_Propertys
                 {
                     _value = value;
                     OnPropertyChanged(nameof(Value));
-                    EventChangedValue?.Invoke(this);
+                    EventValueChanged?.Invoke(this);
                     BackgroundValue = BackgroundValueRule?.Invoke(this);
 
                     foreach (ManualResetEvent alement in wait_handler) { alement.Set(); }
@@ -272,7 +276,7 @@ namespace xLib.UI_Propertys
             get { return (TValue)_value; }
         }
 
-        public new TRequest Request
+        public TRequest Request
         {
             set
             {
@@ -280,24 +284,21 @@ namespace xLib.UI_Propertys
                 {
                     _request = value;
                     OnPropertyChanged(nameof(Request));
-                    EventChangedRequest?.Invoke(this);
+                    EventRequestChanged?.Invoke(this);
                     BackgroundRequest = BackgroundRequestRule?.Invoke(this);
                 }
             }
             get { return (TRequest)_request; }
         }
 
-        public override void BackgroundsUpdate()
+        public override void Update()
         {
             BackgroundRequest = BackgroundRequestRule?.Invoke(this);
             BackgroundValue = BackgroundValueRule?.Invoke(this);
         }
 
-        public async Task<TValue> WaitValue(TValue state, int time)
-        {
-            return (TValue)await Task.Run(() => wait_value_state(this, state, time));
-        }
+        public async Task<TValue> WaitValue(TValue state, int time) { return (TValue)await Task.Run(() => wait_value_state(this, state, time)); }
 
-        public override void SelectionChanged() { EventSelectionChanged?.Invoke(this); }
+        public override void Select() { EventSelectionChanged?.Invoke(this); }
     }
 }

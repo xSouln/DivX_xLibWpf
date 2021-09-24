@@ -15,6 +15,7 @@ namespace xLib
     public class xSerialPortOptions
     {
         public int BoadRate = 115200;
+        public bool ConnectionState = false;
         public string LastConnectedPortName = "";
     }
 
@@ -51,7 +52,7 @@ namespace xLib
 
         public xSerialPortOptions SerialPortOptions
         {
-            get { return new xSerialPortOptions { BoadRate = boad_rate, LastConnectedPortName = last_selected_port_name }; }
+            get { return new xSerialPortOptions { BoadRate = boad_rate, LastConnectedPortName = last_selected_port_name, ConnectionState = IsConnected }; }
             set
             {
                 if (value != null)

@@ -234,6 +234,9 @@ namespace xLib.Transceiver
         }
 
         public void Start() { ThreadControl = new Thread(requests_control); ThreadControl.Start(_requests); }
+
+        public xRequestControl() { Start(); }
+
         public void Dispose() { ThreadControl?.Abort(); }
     }
 }

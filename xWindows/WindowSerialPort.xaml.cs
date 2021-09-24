@@ -20,12 +20,12 @@ namespace xLib
     /// <summary>
     /// Логика взаимодействия для WindowComPortConnection.xaml
     /// </summary>
-    public partial class WindowComPortConnection : Window
+    public partial class WindowSerialPort : Window
     {
-        public static WindowComPortConnection window;
+        public static WindowSerialPort window;
         public static xSerialPort SerialPort;
 
-        public WindowComPortConnection()
+        public WindowSerialPort()
         {
             InitializeComponent();
 
@@ -56,7 +56,7 @@ namespace xLib
         {
             if (window == null)
             {
-                window = new WindowComPortConnection();
+                window = new WindowSerialPort();
                 window.Closed += new EventHandler(Close_Click);
                 window.Show();
             }

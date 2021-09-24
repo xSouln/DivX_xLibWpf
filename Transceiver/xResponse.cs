@@ -22,13 +22,13 @@ namespace xLib.Transceiver
         object SetContent(xContent content);
     }
 
-    public unsafe class xResponseContentUnmanaged<TContent> : IContentSeter where TContent : unmanaged
+    public unsafe class xResponsePacket<TContent> : IContentSeter where TContent : unmanaged
     {
         public TContent *Obj;
         public xContent Content;
 
-        public xResponseContentUnmanaged() { }
-        public xResponseContentUnmanaged(xContent content) { Content = content; Obj = (TContent*)content.Obj; }
+        public xResponsePacket() { }
+        public xResponsePacket(xContent content) { Content = content; Obj = (TContent*)content.Obj; }
         public object SetContent(xContent content) { Content = content; Obj = (TContent*)content.Obj; return this; }
     }
 
@@ -53,7 +53,7 @@ namespace xLib.Transceiver
         protected string header = "";
 
         public DParseRule<xResponse> ParseRule;
-        public DReceiver<xResponse, xResponseContentUnmanaged<byte>> EventReceive;
+        public DReceiver<xResponse, xResponsePacket<byte>> EventReceive;
         public xEvent Tracer;
 
         public virtual string Name
@@ -77,7 +77,7 @@ namespace xLib.Transceiver
             return false;
         }
 
-        public unsafe virtual void Receive(xContent content) { Tracer?.Invoke("Receive" + name); EventReceive?.Invoke(this, new xResponseContentUnmanaged<byte>(content)); }
+        public unsafe virtual void Receive(xContent content) { Tracer?.Invoke("Receive" + name); EventReceive?.Invoke(this, new xResponsePacket<byte>(content)); }
     }
 
     public class xResponse<TContent> : xResponse where TContent : IContentSeter, new()
@@ -98,7 +98,7 @@ namespace xLib.Transceiver
         public unsafe override void Receive(xContent content) { Tracer?.Invoke("Receive" + name); EventReceive?.Invoke(this, (TContent)new TContent().SetContent(content)); }
     }
 
-    public class xResponse<TContent, TResponseInfo> : xResponse, IResponseAction where TContent : IContentSeter, new() where TResponseInfo : unmanaged, IResponseAction
+    public class xResponse<TContent, TResponseInfo> : xResponse, IResponseAction where TContent : IContentSeter, new() where TResponseInfo : IResponseAction
     {
         public TResponseInfo Info;
         public ushort Action { get { return Info.Action; } set { } }
