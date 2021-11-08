@@ -8,7 +8,7 @@
     <OutputType>WinExe</OutputType>
     <RootNamespace>xLib</RootNamespace>
     <AssemblyName>xLibWpf</AssemblyName>
-    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <WarningLevel>4</WarningLevel>
@@ -55,16 +55,27 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.IO.RecyclableMemoryStream, Version=2.2.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\..\EPR_Terminal\EPR_Math\packages\Microsoft.IO.RecyclableMemoryStream.2.2.0\lib\netstandard2.0\Microsoft.IO.RecyclableMemoryStream.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.Annotations, Version=4.2.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\EPR_Terminal\EPR_Math\packages\System.ComponentModel.Annotations.5.0.0\lib\net461\System.ComponentModel.Annotations.dll</HintPath>
+    </Reference>
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.configuration" />
     <Reference Include="System.Data" />
-    <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Runtime.CompilerServices.Unsafe.6.0.0-rc.1.21451.13\lib\net461\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=5.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Runtime.CompilerServices.Unsafe.5.0.0\lib\net45\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
     </Reference>
-    <Reference Include="System.Text.Encodings.Web, Version=6.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Text.Encodings.Web.6.0.0-rc.1.21451.13\lib\net461\System.Text.Encodings.Web.dll</HintPath>
+    <Reference Include="System.Security" />
+    <Reference Include="System.Text.Encodings.Web, Version=5.0.0.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Text.Encodings.Web.5.0.1\lib\net461\System.Text.Encodings.Web.dll</HintPath>
     </Reference>
+    <Reference Include="System.Threading.Tasks" />
     <Reference Include="System.ValueTuple, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.ValueTuple.4.5.0\lib\net47\System.ValueTuple.dll</HintPath>
+      <HintPath>..\..\EPR_Terminal\EPR_Math\packages\System.ValueTuple.4.5.0\lib\net461\System.ValueTuple.dll</HintPath>
     </Reference>
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
@@ -86,23 +97,33 @@
     </ApplicationDefinition>
     <Compile Include="Sources\xCBase.cs" />
     <Compile Include="Sources\xCommunicationControl.cs" />
+    <Compile Include="Sources\xList.cs" />
     <Compile Include="Sources\xSerialPort.cs" />
     <Compile Include="Sources\xConverter.cs" />
     <Compile Include="Sources\xHexReader.cs" />
     <Compile Include="Sources\xReceiver.cs" />
+    <Compile Include="Sources\xTcpServer.cs" />
     <Compile Include="Transceiver\xRequest.cs" />
     <Compile Include="Transceiver\xRequestBuilder.cs" />
-    <Compile Include="Transceiver\xRequstsControl.cs" />
+    <Compile Include="Transceiver\xRequestLine.cs" />
     <Compile Include="Transceiver\xResponse.cs" />
     <Compile Include="Sources\xSerializer.cs" />
     <Compile Include="Sources\xSupport.cs" />
     <Compile Include="Sources\xTcp.cs" />
     <Compile Include="Sources\xTracer.cs" />
     <Compile Include="Sources\xTypedef.cs" />
+    <Compile Include="Transceiver\xResponseBuilder.cs" />
     <Compile Include="UI_Propertys\UI_Button.cs" />
     <Compile Include="UI_Propertys\UI_FProperty.cs" />
     <Compile Include="UI_Propertys\UI_LoaderHandler.cs" />
     <Compile Include="UI_Propertys\UI_Property.cs" />
+    <Compile Include="xWindows\Resources\Init.cs" />
+    <Compile Include="xWindows\WindowConfirmation.xaml.cs">
+      <DependentUpon>WindowConfirmation.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="xWindows\WindowTcpServer.xaml.cs">
+      <DependentUpon>WindowTcpServer.xaml</DependentUpon>
+    </Compile>
     <Compile Include="xWindows\WindowTerminal.xaml.cs" />
     <Compile Include="xWindows\WindowSerialPort.xaml.cs" />
     <Compile Include="xWindows\WindowTcpConnection.xaml.cs">
@@ -122,6 +143,30 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="xWindows\Resources\ButtonPattern.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="xWindows\Resources\ListViewPattern.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="xWindows\Resources\MenuPattern.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="xWindows\Resources\TextBoxPattern.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="xWindows\WindowConfirmation.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="xWindows\WindowTcpServer.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="xWindows\WindowTerminal.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

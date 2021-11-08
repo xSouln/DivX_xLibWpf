@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -40,12 +41,13 @@ namespace xLib.UI_Propertys
         public delegate void xEventChanged<TProperty>(TProperty property);
         public delegate void xEventBackgroundChanged<TProperty>(TProperty property);
         public delegate Brush xBackgroundRule<TProperty>(TProperty property);
+        public delegate TValue ParseRule<TValue>(TValue last, TValue request);
 
         protected string name = "";
         protected string note = "";
         protected bool state = false;
         protected bool is_writable = false;
-        protected bool is_enable = false;
+        protected bool is_enable = true;
         protected int code;
 
         protected object _value;
@@ -59,20 +61,23 @@ namespace xLib.UI_Propertys
         public static Brush YELLOW = (Brush)new BrushConverter().ConvertFrom("#FF724C21");
         public static Brush TRANSPARENT = null;
 
-        //public Brush BackgroundFalse = (Brush)new BrushConverter().ConvertFrom("#FF641818");
-        //public Brush BackgroundTrue = (Brush)new BrushConverter().ConvertFrom("#FF21662A");
         protected Brush background_value;
         protected Brush background_request;
 
         public object Content;
-        public xEvent<UI_Property> EventSelectionChanged;
-        public xEvent<UI_Property> EventClick;
+        public xEvent<UI_Property> EventSelection;
         public xEvent<UI_Property> EventValueChanged;
         public xEvent<UI_Property> EventRequestChanged;
         public xBackgroundRule<UI_Property> BackgroundValueRule;
         public xBackgroundRule<UI_Property> BackgroundRequestRule;
 
-        protected List<ManualResetEvent> wait_handler = new List<ManualResetEvent>();
+        public static Brush GetBrush(string request)
+        {
+            Brush brush = null;
+            try { brush = (Brush)new BrushConverter().ConvertFrom(request); }
+            catch { }
+            return brush;
+        }
 
         public virtual string Name
         {
@@ -84,6 +89,12 @@ namespace xLib.UI_Propertys
         {
             set { note = value; OnPropertyChanged(nameof(Note)); }
             get { return note; }
+        }
+
+        public virtual int Code
+        {
+            set { code = value; OnPropertyChanged(nameof(Code)); }
+            get { return code; }
         }
 
         public bool IsEnable
@@ -139,9 +150,6 @@ namespace xLib.UI_Propertys
                     OnPropertyChanged(nameof(Value));
                     EventValueChanged?.Invoke(this);
                     BackgroundValue = BackgroundValueRule?.Invoke(this);
-
-                    foreach (ManualResetEvent alement in wait_handler) { alement.Set(); }
-                    wait_handler.Clear();
                 }
             }
         }
@@ -167,22 +175,17 @@ namespace xLib.UI_Propertys
             BackgroundValue = BackgroundValueRule?.Invoke(this);
         }
 
-        protected static void timer_callback(object arg)
+        protected async Task<object> wait_value_state(UI_Property property, object state, int time)
+        //protected object wait_value_state(UI_Property property, object state, int time)
         {
-            ManualResetEvent handler = (ManualResetEvent)arg;
-            handler?.Set();
-        }
-
-        protected static object wait_value_state(UI_Property property, object state, int time)
-        {
-            if (Comparer<object>.Default.Compare(property.Value, state) == 0) { return property.Value; }
-
-            ManualResetEvent handler = new ManualResetEvent(false);
-            Timer timer = new Timer(timer_callback, handler, time, 0);
-            property.wait_handler.Add(handler);
-            handler.WaitOne();
-            timer?.Dispose();
-
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Start();
+            while (Comparer<object>.Default.Compare(_value, state) != 0 && stopwatch.ElapsedMilliseconds < time)
+            {
+                await Task.Delay(1);
+                //Thread.Sleep(1);
+            }
+            stopwatch.Stop();
             return property.Value;
         }
 
@@ -191,20 +194,20 @@ namespace xLib.UI_Propertys
             return await Task.Run(() => wait_value_state(this, state, time));
         }
 
-        public virtual void Select() { EventSelectionChanged?.Invoke(this); }
+        public virtual void Select() { EventSelection?.Invoke(this); }
     }
 
     public class UI_Property<TValue> : UI_Property, IUI_PropertyEvents
     {
         public UI_Property() { _value = default(TValue); _request = default(TValue); }
 
-        public new xEvent<UI_Property<TValue>> EventSelectionChanged;
         public new xEvent<UI_Property<TValue>> EventValueChanged;
         public new xEvent<UI_Property<TValue>> EventRequestChanged;
+        public new xEvent<UI_Property<TValue>> EventSelection;
         public new xBackgroundRule<UI_Property<TValue>> BackgroundValueRule;
         public new xBackgroundRule<UI_Property<TValue>> BackgroundRequestRule;
 
-        public TValue Value
+        public new TValue Value
         {
             set
             {
@@ -214,15 +217,12 @@ namespace xLib.UI_Propertys
                     OnPropertyChanged(nameof(Value));
                     EventValueChanged?.Invoke(this);
                     BackgroundValue = BackgroundValueRule?.Invoke(this);
-
-                    foreach (ManualResetEvent alement in wait_handler) { alement.Set(); }
-                    wait_handler.Clear();
                 }
             }
             get { return (TValue)_value; }
         }
 
-        public TValue Request
+        public new TValue Request
         {
             set
             {
@@ -245,38 +245,37 @@ namespace xLib.UI_Propertys
 
         public async Task<TValue> WaitValue(TValue state, int time) { return (TValue)await Task.Run(() => wait_value_state(this, state, time)); }
 
-        public override void Select() { EventSelectionChanged?.Invoke(this); }
+        public override void Select() { EventSelection?.Invoke(this); }
     }
 
-    public class UI_Property<TValue, TRequest> : UI_Property, IUI_PropertyEvents where TValue : IComparable// where TRequest : IComparable
+    public class UI_Property<TValue, TRequest> : UI_Property, IUI_PropertyEvents where TValue : IComparable
     {
         public UI_Property() { _value = default(TValue); _request = default(TRequest); }
 
-        public new xEvent<UI_Property<TValue, TRequest>> EventSelectionChanged;
         public new xEvent<UI_Property<TValue, TRequest>> EventValueChanged;
         public new xEvent<UI_Property<TValue, TRequest>> EventRequestChanged;
+        public new xEvent<UI_Property<TValue, TRequest>> EventSelection;
+        public ParseRule<TValue> ValueParseRule;
         public new xBackgroundRule<UI_Property<TValue, TRequest>> BackgroundValueRule;
         public new xBackgroundRule<UI_Property<TValue, TRequest>> BackgroundRequestRule;
 
-        public TValue Value
+        public new TValue Value
         {
             set
             {
+                if (ValueParseRule != null) { value = ValueParseRule((TValue)_value, value); }
                 if (Comparer<TValue>.Default.Compare((TValue)_value, value) != 0)
                 {
                     _value = value;
                     OnPropertyChanged(nameof(Value));
                     EventValueChanged?.Invoke(this);
                     BackgroundValue = BackgroundValueRule?.Invoke(this);
-
-                    foreach (ManualResetEvent alement in wait_handler) { alement.Set(); }
-                    wait_handler.Clear();
                 }
             }
             get { return (TValue)_value; }
         }
 
-        public TRequest Request
+        public new TRequest Request
         {
             set
             {
@@ -299,6 +298,6 @@ namespace xLib.UI_Propertys
 
         public async Task<TValue> WaitValue(TValue state, int time) { return (TValue)await Task.Run(() => wait_value_state(this, state, time)); }
 
-        public override void Select() { EventSelectionChanged?.Invoke(this); }
+        public override void Select() { EventSelection?.Invoke(this); }
     }
 }

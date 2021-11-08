@@ -14,7 +14,7 @@ namespace xLib.Transceiver
         void GetData(List<byte> data);
     }
 
-    public abstract class xRequestBuilderBase : NotifyPropertyChanged
+    public abstract class xBuilderBase : NotifyPropertyChanged
     {
         public const char START_CHARECTER = '#';
         public const int DEFAULT_REQUEST_TIME = 100;
@@ -24,7 +24,8 @@ namespace xLib.Transceiver
         public string End = "";
         protected xResponse response;
 
-        public xEvent Tracer;
+        public xEvent<string> Tracer;
+        public xRequestHandler RequestHandler;
 
         public bool IsNotify;
 
@@ -37,110 +38,223 @@ namespace xLib.Transceiver
         public virtual xResponse Response { get { return response; } set { response = value; } }
     }
 
-    public class xRequestBuilder : xRequestBuilderBase
+    public class xBuilder<TResult> : xBuilderBase where TResult : xResponseResult, new()
     {
-        public virtual unsafe xRequest Prepare(void* obj, int obj_size)
+        public xBuilder(List<xResponse> responses, xRequestHandler handler, string name) : base()
         {
-            xRequest RequestPacket = new xRequest { Response = Response, Builder = this };
+            response = new xResponse<TResult>(responses) { Name = name, ParseRule = ParseRule };
+            Name = name;
+            RequestHandler = handler;
+        }
+
+        public new xResponse<TResult> Response { get { return (xResponse<TResult>)response; } set { response = value; } }
+
+        public virtual unsafe xRequest<TResult> Prepare(void* obj, int obj_size)
+        {
+            xRequest<TResult> RequestPacket = new xRequest<TResult>()//(Response)
+            {
+                Response = new xResponse<TResult>(Response),
+                Builder = this,
+                Tracer = Tracer,
+                Handler = RequestHandler
+            };
             List<byte> request_data = new List<byte>();
+
             add_data(request_data, Header);
             add_data(request_data, obj, obj_size);
             add_data(request_data, End);
+
             RequestPacket.Data = request_data.ToArray();
             return RequestPacket;
         }
 
-        public virtual xRequest Prepare()
+        public virtual xRequest<TResult> Prepare()
         {
-            xRequest RequestPacket = new xRequest { Response = Response, Builder = this };
+            xRequest<TResult> RequestPacket = new xRequest<TResult>()//(Response)
+            {
+                Response = new xResponse<TResult>(Response),
+                Builder = this,
+                Tracer = Tracer,
+                Handler = RequestHandler
+            };
             List<byte> request_data = new List<byte>();
+
             add_data(request_data, Header);
             add_data(request_data, End);
             RequestPacket.Data = request_data.ToArray();
+
             return RequestPacket;
         }
 
-        public virtual xRequest Prepare(string request)
+        public virtual xRequest<TResult> Prepare(string request)
         {
-            xRequest RequestPacket = new xRequest { Response = Response, Builder = this };
+            xRequest<TResult> RequestPacket = new xRequest<TResult>()//(Response)
+            {
+                Response = new xResponse<TResult>(Response),
+                Builder = this,
+                Tracer = Tracer,
+                Handler = RequestHandler
+            };
             List<byte> request_data = new List<byte>();
+
             add_data(request_data, Header);
             add_data(request_data, request);
             add_data(request_data, End);
+
             RequestPacket.Data = request_data.ToArray();
             return RequestPacket;
         }
 
-        public virtual xRequest Prepare(byte[] request)
+        protected virtual unsafe object ParseRule(xResponse response, xContent content)
         {
-            xRequest RequestPacket = new xRequest { Response = Response, Builder = this };
-            List<byte> request_data = new List<byte>();
-            add_data(request_data, Header);
-            add_data(request_data, request);
-            add_data(request_data, End);
-            RequestPacket.Data = request_data.ToArray();
-            return RequestPacket;
-        }
-    }
-
-    public class xRequestBuilder<TResponse, TRequestInfo> : xRequestBuilderBase where TRequestInfo : IDataProvider, IRequestInfo where TResponse : xResponse
-    {
-        public TRequestInfo Info;
-        public new TResponse Response { get { return (TResponse)response; } set { response = value; } }
-
-        public virtual unsafe xRequest Prepare(void* obj, int obj_size)
-        {
-            xRequest RequestPacket = new xRequest { Response = Response, Builder = this };
-            List<byte> request_data = new List<byte>();
-
-            add_data(request_data, Header);
-
-            Info.Size = (ushort)obj_size;
-            Info.GetData(request_data);
-
-            add_data(request_data, obj, obj_size);
-            add_data(request_data, End);
-            RequestPacket.Data = request_data.ToArray();
-            return RequestPacket;
-        }
-
-        public virtual unsafe xRequest Prepare()
-        {
-            xRequest RequestPacket = new xRequest { Response = Response, Builder = this };
-            List<byte> request_data = new List<byte>();
-
-            add_data(request_data, Header);
-
-            Info.Size = 0;
-            Info.GetData(request_data);
-
-            add_data(request_data, End);
-            RequestPacket.Data = request_data.ToArray();
-
-            return RequestPacket;
+            if (xConverter.Compare(response.Header, content))
+            {
+                content.Size = content.Size - response.Header.Length;
+                content.Obj = content.Obj + response.Header.Length;
+                return content;
+            }
+            return null;
         }
     }
 
-    public class xRequestBuilder<TResponse, TRequestInfo, TRequest> : xRequestBuilderBase where TRequest : unmanaged where TResponse : xResponse where TRequestInfo : IDataProvider, IRequestInfo
+    public class xBuilder<TResult, TRequest> : xBuilderBase where TResult : xResponseResult, new() where TRequest : unmanaged
     {
-        public TRequestInfo Info;
-        public new TResponse Response { get { return (TResponse)response; } set { response = value; } }
-
-        public unsafe xRequest Prepare(TRequest request)
+        public xBuilder(List<xResponse> responses, xRequestHandler handler) : base()
         {
-            xRequest RequestPacket = new xRequest { Response = Response, Builder = this };
+            response = new xResponse<TResult>(responses);
+            RequestHandler = handler;
+        }
+
+        public new xResponse<TResult> Response { get { return (xResponse<TResult>)response; } set { response = value; } }
+
+        public unsafe xRequest<TResult> Prepare(TRequest request)
+        {
+            xRequest<TResult> RequestPacket = new xRequest<TResult>()//(Response)
+            {
+                Response = new xResponse<TResult>(Response),
+                Builder = this,
+                Tracer = Tracer,
+                Handler = RequestHandler
+            };
             List<byte> request_data = new List<byte>();
 
             add_data(request_data, Header);
-
-            Info.Size = (ushort)sizeof(TRequest);
-            Info.GetData(request_data);
-
             add_data(request_data, &request, sizeof(TRequest));
             add_data(request_data, End);
 
             RequestPacket.Data = request_data.ToArray();
             return RequestPacket;
+        }
+
+        protected virtual unsafe object ParseRule(xResponse response, xContent content)
+        {
+            if (xConverter.Compare(response.Header, content))
+            {
+                content.Size = content.Size - response.Header.Length;
+                content.Obj = content.Obj + response.Header.Length;
+                return content;
+            }
+            return null;
+        }
+    }
+
+    public class xBuilderPacket<TResult, TAction> : xBuilderBase where TResult : xResponseResult, new() where TAction : unmanaged
+    {
+        public xBuilderPacket(List<xResponse> responses, xRequestHandler handler, TAction action)
+        {
+            response = new xResponse<TResult, TAction>(responses, action) { Name = "" + action, ParseRule = ParseRule };
+            Name = "" + action;
+            Action = action;
+            RequestHandler = handler;
+        }
+
+        public new xResponse<TResult, TAction> Response { get { return (xResponse<TResult, TAction>)response; } set { response = value; } }
+
+        public readonly TAction Action;
+
+        public virtual unsafe xRequest<TResult> Prepare()
+        {
+            xRequest<TResult> RequestPacket = new xRequest<TResult>()//(Response)
+            {
+                Response = new xResponse<TResult, TAction>(null, Response),
+                Builder = this,
+                Tracer = Tracer,
+                Handler = RequestHandler
+            };
+            RequestInfoT info = new RequestInfoT { Action = (ushort)(object)Action };
+            List<byte> request_data = new List<byte>();
+
+            add_data(request_data, Header);
+            add_data(request_data, &info, sizeof(ResponseInfoT));
+            add_data(request_data, End);
+
+            RequestPacket.Data = request_data.ToArray();
+            return RequestPacket;
+        }
+
+        protected virtual unsafe object ParseRule(xResponse response, xContent content)
+        {
+            ResponseT *packet = (ResponseT*)content.Obj;
+            if (xConverter.Compare(response.Header, &packet->Prefix, sizeof(ResponsePrefixT))
+                && response is IResponseAction<TAction> value
+                && (ushort)(object)value.Action == packet->Info.Action)
+            {
+                content.Obj += sizeof(ResponseT);
+                content.Size -= sizeof(ResponseT);
+                return content;
+            }
+            return null;
+        }
+    }
+
+    public class xBuilderPacket<TResult, TAction, TRequest> : xBuilderBase where TResult : xResponseResult, new() where TRequest : unmanaged
+    {
+        public xBuilderPacket(List<xResponse> responses, xRequestHandler handler, TAction action)
+        {
+            response = new xResponse<TResult, TAction>(responses, action) { Name = "" + action, ParseRule = ParseRule };
+            Name = "" + action;
+            Action = action;
+            RequestHandler = handler;
+        }
+
+        public new xResponse<TResult, TAction> Response { get { return (xResponse<TResult, TAction>)response; } set { response = value; } }
+
+        public readonly TAction Action;
+
+        public virtual unsafe xRequest<TResult> Prepare(TRequest request)
+        {
+            xRequest<TResult> RequestPacket = new xRequest<TResult>()//(Response)
+            {
+                Response = new xResponse<TResult, TAction>(null, Response),
+                Builder = this,
+                Tracer = Tracer,
+                Handler = RequestHandler
+            };
+
+            RequestInfoT info = new RequestInfoT { Action = (ushort)(object)Action, Size = (ushort)sizeof(TRequest) };
+            List<byte> request_data = new List<byte>();
+
+            add_data(request_data, Header);
+            add_data(request_data, &info, sizeof(ResponseInfoT));
+            add_data(request_data, &request, sizeof(TRequest));
+            add_data(request_data, End);
+
+            RequestPacket.Data = request_data.ToArray();
+            return RequestPacket;
+        }
+
+        protected virtual unsafe object ParseRule(xResponse response, xContent content)
+        {
+            ResponseT* packet = (ResponseT*)content.Obj;
+            if (xConverter.Compare(response.Header, &packet->Prefix, sizeof(ResponsePrefixT))
+                && response is IResponseAction<TAction> value
+                && (ushort)(object)value.Action == packet->Info.Action)
+            {
+                content.Obj += sizeof(ResponseT);
+                content.Size -= sizeof(ResponseT);
+                return content;
+            }
+            return null;
         }
     }
 }

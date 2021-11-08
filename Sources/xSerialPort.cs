@@ -57,8 +57,8 @@ namespace xLib
             {
                 if (value != null)
                 {
-                    boad_rate = value.BoadRate;
-                    last_selected_port_name = value.LastConnectedPortName;
+                    BoadRate = value.BoadRate;
+                    PortName = value.LastConnectedPortName;
                 }
             }
         }

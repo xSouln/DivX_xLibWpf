@@ -1,4 +1,5 @@
-﻿using System.Windows.Media;
+﻿using System.Windows;
+using System.Windows.Media;
 using xLib.UI_Propertys;
 
 namespace xLib.UI_Propertys
@@ -32,7 +33,23 @@ namespace xLib.UI_Propertys
         public string Name
         {
             set { name = value; OnPropertyChanged(nameof(Name)); }
-            get { return name; }
+            get
+            {
+                if (state && name != NameOn) { name = NameOn; }
+                else if (!state && name != NameOff) { name = NameOff; }
+                return name;
+            }
+        }
+
+        public Brush Background
+        {
+            set { background = value; OnPropertyChanged(nameof(Background)); }
+            get
+            {
+                if (state && background != BackgroundOn) { background = BackgroundOn; }
+                else if (!state && background != BackgroundOff) { background = BackgroundOff; }
+                return background;
+            }
         }
 
         public bool State
@@ -41,11 +58,8 @@ namespace xLib.UI_Propertys
             {
                 state = value;
                 OnPropertyChanged(nameof(State));
-
-                if (is_ignore) { Background = null; return; }
-
-                if (state) { Name = NameOn; Background = BackgroundOn; }
-                else { Name = NameOff; Background = BackgroundOff; }
+                OnPropertyChanged(nameof(Name));
+                OnPropertyChanged(nameof(Background));
             }
             get { return state; }
         }
@@ -62,10 +76,9 @@ namespace xLib.UI_Propertys
             get { return is_ignore; }
         }
 
-        public Brush Background
+        private void Click(object sender, RoutedEventArgs e)
         {
-            set { background = value; OnPropertyChanged(nameof(Background)); }
-            get { return background; }
+            State ^= state;
         }
     }
 }

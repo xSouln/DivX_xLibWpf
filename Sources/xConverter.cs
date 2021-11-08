@@ -36,6 +36,14 @@ namespace xLib
             return true;
         }
 
+        public static unsafe bool Compare(string str, xContent content)
+        {
+            if (str == null || str.Length == 0 || str.Length > content.Size) { return false; }
+
+            for (int i = 0; i < str.Length; i++) { if (str[i] != content.Obj[i]) { return false; } }
+            return true;
+        }
+
         public static unsafe bool Compare(byte[] data1, void *data2, int data_len)
         {
             byte* ptr = (byte*)data2;
@@ -44,6 +52,7 @@ namespace xLib
             for (int i = 0; i < data_len; i++) if (data1[i] != ptr[i]) return false;
             return true;
         }
+
         public static unsafe bool Compare(string data1, void* data2, int data_len)
         {
             byte* ptr = (byte*)data2;
@@ -55,12 +64,8 @@ namespace xLib
 
         public static bool Compare(string data1, string data2)
         {
-            if (data1 == null || data2 == null) return false;
-
-            int len = data2.Length;
-            if (data1.Length < len) len = data1.Length;
-
-            for (int i = 0; i < len; i++) if (data1[i] != data2[i]) return false;
+            if (data1 == null || data2 == null || data1.Length > data2.Length) { return false; }
+            for (int i = 0; i < data1.Length; i++) { if (data1[i] != data2[i]) return false; }
             return true;
         }
 
@@ -244,6 +249,9 @@ namespace xLib
             return str;
         }
         public static unsafe string GetString(void* obj, int obj_size) { return GetString(obj, 0, obj_size); }
+
+        public static unsafe string GetString(xContent content) { return GetString(content.Obj, 0, content.Size); }
+
         public static unsafe string GetString(void* obj, int obj_size, char end) { return GetString(obj, 0, obj_size, end); }
         //===============================================================================================================================================================================
         public object get_value(TypeCode type, string text)

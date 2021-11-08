@@ -40,7 +40,7 @@ namespace xLib
             Tcp?.Disconnect();
         }
 
-        public static void Open_Click(object sender, RoutedEventArgs e)
+        public static void OpenClick(object sender, RoutedEventArgs e)
         {
             if (window == null)
             {

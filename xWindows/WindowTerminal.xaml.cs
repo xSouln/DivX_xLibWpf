@@ -12,6 +12,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using xLib.UI_Propertys;
 
 namespace xLib
 {
@@ -21,26 +22,21 @@ namespace xLib
     public partial class WindowTerminal : Window
     {
         private static WindowTerminal window;
-        private static ObservableCollection<ReceivePacketInfo> note_info;
-        private static ObservableCollection<ReceivePacketInfo> note_loge;
+        private UI_Button but_pause = new UI_Button("Resume", "Pause", UI_Property.RED, UI_Property.GREEN);
+
         public WindowTerminal()
         {
             InitializeComponent();
-            ListViewInfo.ItemsSource = note_info;
-            ListViewLog.ItemsSource = note_loge;
+            ListViewInfo.ItemsSource = NoteInfo;
+            ListViewLog.ItemsSource = NoteLog;
+
+            but_pause.State = xTracer.Pause;
+            ButPause.DataContext = but_pause;
         }
 
-        public static ObservableCollection<ReceivePacketInfo> NoteInfo
-        {
-            get { return note_info; }
-            set { note_info = value; }
-        }
+        public static ObservableCollection<ReceivePacketInfo> NoteInfo { get; set; }
 
-        public static ObservableCollection<ReceivePacketInfo> NoteLog
-        {
-            get { return note_loge; }
-            set { note_loge = value; }
-        }
+        public static ObservableCollection<ReceivePacketInfo> NoteLog { get; set; } = xTracer.Notes;
 
         public static void OpenClick(object sender, RoutedEventArgs e)
         {
@@ -64,13 +60,14 @@ namespace xLib
         private void ButClear_Click(object sender, RoutedEventArgs e)
         {
             TabItem item = (TabItem)TabControl.SelectedItem;
-            if (item.Header.ToString() == "Log" && note_loge != null) { note_loge.Clear(); return; }
-            if (item.Header.ToString() == "Info" && note_info != null) { note_info.Clear(); return; }
+            if (item.Header.ToString() == "Log" && NoteLog != null) { NoteLog.Clear(); return; }
+            if (item.Header.ToString() == "Info" && NoteInfo != null) { NoteInfo.Clear(); return; }
         }
 
         private void ButPause_Click(object sender, RoutedEventArgs e)
         {
-
+            but_pause.State ^= true;
+            xTracer.Pause = but_pause.State;
         }
     }
 }

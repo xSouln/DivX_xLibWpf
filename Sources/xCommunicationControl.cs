@@ -23,7 +23,7 @@ namespace xLib.Sources
         public Brush Background
         {
             get { return background; }
-            set { if (background != value) { background = value; OnPropertyChanged(nameof(Background)); } }
+            set { background = value; OnPropertyChanged(nameof(Background)); }
         }
 
         public bool IsAvailable
@@ -31,8 +31,8 @@ namespace xLib.Sources
             get { return is_available; }
             set
             {
-                if (value && background != background_true) { background = background_true; }
-                else if(!value && background != background_false) { background = background_false; }
+                if (value && background != background_true) { Background = background_true; }
+                else if(!value && background != background_false) { Background = background_false; }
 
                 if (is_available != value)
                 {

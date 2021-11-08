@@ -1,0 +1,43 @@
+﻿<Window x:Class="xLib.xWindows.WindowTcpServer"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:xLib.xWindows" xmlns:sources="clr-namespace:xLib.Sources" d:DataContext="{d:DesignInstance Type=sources:xTcpServer}"
+        mc:Ignorable="d"
+        Title="tcp server" Height="450" Width="800" Background="#FF3F3F46" FontSize="18">
+    <Grid>
+        <Button x:Name="ButConnection" Background="{Binding StateBackground}" Content="Connect" Template="{DynamicResource ButtonTemplate1}" BorderBrush="#FFB24646" FontSize="18" Foreground="#FFDEC316" Margin="158,276,0,0" Height="36" VerticalAlignment="Top" HorizontalAlignment="Left" Width="160" Click="ButConnection_Click"/>
+        <ListView x:Name="ListViewPtopertys" FontSize="18" Background="#FF3F3F46" BorderBrush="#FF834545" Foreground="#FFDEC316" Height="269" VerticalAlignment="Top" HorizontalAlignment="Left" Width="319">
+            <ListView.Resources>
+                <Style TargetType="{x:Type ListViewItem}">
+                    <Style.Triggers>
+                        <Trigger Property="IsFocused" Value="True">
+                            <Setter Property="Background" Value="Transparent"/>
+                        </Trigger>
+
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter Property="Background" Value="Transparent"/>
+                        </Trigger>
+
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Background" Value="Transparent"/>
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+            </ListView.Resources>
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn Header="Name" DisplayMemberBinding="{Binding Name}" Width="100"/>
+                    <GridViewColumn Header="Value" Width="200">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBox Text="{Binding Value}" IsReadOnly="{Binding IsReadOnly}" IsEnabled="{Binding IsEnable}" FontSize="18" Padding="-3" Background="Transparent" BorderBrush="#FF3F3F46" Foreground="#FFDEC316" Height="20" Width="150"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                </GridView>
+            </ListView.View>
+        </ListView>
+    </Grid>
+</Window>

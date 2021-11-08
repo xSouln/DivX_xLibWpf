@@ -29,27 +29,35 @@ namespace xLib
         {
             InitializeComponent();
 
-            //FindComPortsBox.ItemsSource = SerialPort.PortList;
             GridPropertys.DataContext = SerialPort;
             DataContext = this;
+
+            //if (SerialPort != null) { SerialPort.SerialPortOptions = Properties.Settings.Default.SerialPortOptions; }
+
+            Closed += WindowSerialPortClosed;
+        }
+
+        private void WindowSerialPortClosed(object sender, EventArgs e)
+        {
+
         }
 
         private void ConnectBut_Click(object sender, RoutedEventArgs e)
         {
             if (FindComPortsBox.SelectedIndex != -1)
             {
-                SerialPort.Connect((string)FindComPortsBox.SelectedValue);
+                SerialPort?.Connect((string)FindComPortsBox.SelectedValue);
             }
         }
 
         private void DisconnectBut_Click(object sender, RoutedEventArgs e)
         {
-            SerialPort.Disconnect();
+            SerialPort?.Disconnect();
         }
 
         private void TransmitBut_Click(object sender, RoutedEventArgs e)
         {
-            if (TransmitDataTextBox.Text.Length > 0) { SerialPort.Send(TransmitDataTextBox.Text); }
+            if (TransmitDataTextBox.Text.Length > 0) { SerialPort?.Send(TransmitDataTextBox.Text); }
         }
 
         public static void OpenClick(object sender, RoutedEventArgs e)
@@ -71,7 +79,12 @@ namespace xLib
 
         public static void Dispose()
         {
-            SerialPort?.Disconnect();
+            if (SerialPort != null)
+            {
+                Properties.Settings.Default.SerialPortOptions = SerialPort.SerialPortOptions;
+                Properties.Settings.Default.Save();
+                SerialPort.Disconnect();
+            }
             window?.Close();
             window = null;
         }
