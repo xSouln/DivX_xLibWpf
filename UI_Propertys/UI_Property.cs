@@ -175,8 +175,7 @@ namespace xLib.UI_Propertys
             BackgroundValue = BackgroundValueRule?.Invoke(this);
         }
 
-        protected async Task<object> wait_value_state(UI_Property property, object state, int time)
-        //protected object wait_value_state(UI_Property property, object state, int time)
+        protected async Task<object> wait_value_state_async(UI_Property property, object state, int time)
         {
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
@@ -189,12 +188,27 @@ namespace xLib.UI_Propertys
             return property.Value;
         }
 
-        public virtual async Task<object> WaitValue(object state, int time)
+        protected object wait_value_state(UI_Property property, object state, int time)
         {
-            return await Task.Run(() => wait_value_state(this, state, time));
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Start();
+            while (Comparer<object>.Default.Compare(_value, state) != 0 && stopwatch.ElapsedMilliseconds < time)
+            {
+                Thread.Sleep(1);
+            }
+            stopwatch.Stop();
+            return property.Value;
         }
 
-        public virtual void Select() { EventSelection?.Invoke(this); }
+        public virtual async Task<object> WaitValue(object state, int time)
+        {
+            return await Task.Run(() => wait_value_state_async(this, state, time));
+        }
+
+        public virtual void Select()
+        {
+            EventSelection?.Invoke(this);
+        }
     }
 
     public class UI_Property<TValue> : UI_Property, IUI_PropertyEvents
@@ -243,9 +257,9 @@ namespace xLib.UI_Propertys
             BackgroundValue = BackgroundValueRule?.Invoke(this);
         }
 
-        public async Task<TValue> WaitValue(TValue state, int time) { return (TValue)await Task.Run(() => wait_value_state(this, state, time)); }
+        public async Task<TValue> WaitValue(TValue state, int time) { return (TValue)await Task.Run(() => wait_value_state_async(this, state, time)); }
 
-        public override void Select() { EventSelection?.Invoke(this); }
+        public override void Select() => EventSelection?.Invoke(this);
     }
 
     public class UI_Property<TValue, TRequest> : UI_Property, IUI_PropertyEvents where TValue : IComparable
@@ -296,8 +310,8 @@ namespace xLib.UI_Propertys
             BackgroundValue = BackgroundValueRule?.Invoke(this);
         }
 
-        public async Task<TValue> WaitValue(TValue state, int time) { return (TValue)await Task.Run(() => wait_value_state(this, state, time)); }
+        public async Task<TValue> WaitValue(TValue state, int time) => (TValue)await Task.Run(() => wait_value_state_async(this, state, time));
 
-        public override void Select() { EventSelection?.Invoke(this); }
+        public override void Select() => EventSelection?.Invoke(this);
     }
 }
