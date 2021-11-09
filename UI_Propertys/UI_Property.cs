@@ -202,7 +202,6 @@ namespace xLib.UI_Propertys
 
         public virtual object WaitValue(object state, int time)
         {
-            //return await Task.Run(() => wait_value_state_async(this, state, time));
             return wait_value_state(this, state, time);
         }
 
