@@ -126,7 +126,7 @@ namespace xLib.Transceiver
             return result;
         }
 
-        public async void StartUpdate(int period)
+        public void StartUpdate(int period)
         {
             cancel_token_source?.Cancel();
             cancel_token_source = new CancellationTokenSource();
@@ -135,7 +135,7 @@ namespace xLib.Transceiver
             update_period = period;
             try
             {
-                await Task.Factory.StartNew(async () =>
+                Task.Factory.StartNew(async () =>
                 {
                     Stopwatch stop_watch = new Stopwatch();
                     xAction<bool, byte[]> action_transmitter = transmitter;
