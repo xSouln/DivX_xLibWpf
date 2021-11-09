@@ -273,7 +273,6 @@ namespace xLib.Transceiver
         public virtual xRequest Transmition(xAction<bool, byte[]> transmitter, int try_count, int response_time_out)
         {
             if (transmitter == null || try_count <= 0 || response_time_out <= 0 || transmission_state != ERequestState.Free) { return null; }
-
             this.transmitter = transmitter;
             this.try_count = try_count;
             this.response_time_out = response_time_out;
@@ -307,7 +306,6 @@ namespace xLib.Transceiver
         public new xRequest<TResult> Transmition(xAction<bool, byte[]> transmitter, int try_count, int response_time)
         {
             if (transmitter == null || try_count <= 0 || response_time_out <= 0 || transmission_state != ERequestState.Free) { return null; }
-
             this.transmitter = transmitter;
             this.try_count = try_count;
             this.response_time_out = response_time;

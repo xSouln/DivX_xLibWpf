@@ -200,7 +200,13 @@ namespace xLib.UI_Propertys
             return property.Value;
         }
 
-        public virtual async Task<object> WaitValue(object state, int time)
+        public virtual object WaitValue(object state, int time)
+        {
+            //return await Task.Run(() => wait_value_state_async(this, state, time));
+            return wait_value_state(this, state, time);
+        }
+
+        public virtual async Task<object> WaitValueAsync(object state, int time)
         {
             return await Task.Run(() => wait_value_state_async(this, state, time));
         }
@@ -257,7 +263,17 @@ namespace xLib.UI_Propertys
             BackgroundValue = BackgroundValueRule?.Invoke(this);
         }
 
-        public async Task<TValue> WaitValue(TValue state, int time) { return (TValue)await Task.Run(() => wait_value_state_async(this, state, time)); }
+        //public async Task<TValue> WaitValue(TValue state, int time) { return (TValue)await Task.Run(() => wait_value_state_async(this, state, time)); }
+
+        public virtual TValue WaitValue(TValue state, int time)
+        {
+            return (TValue)wait_value_state(this, state, time);
+        }
+
+        public virtual async Task<TValue> WaitValueAsync(TValue state, int time)
+        {
+            return (TValue)await Task.Run(() => wait_value_state_async(this, state, time));
+        }
 
         public override void Select() => EventSelection?.Invoke(this);
     }
@@ -310,7 +326,17 @@ namespace xLib.UI_Propertys
             BackgroundValue = BackgroundValueRule?.Invoke(this);
         }
 
-        public async Task<TValue> WaitValue(TValue state, int time) => (TValue)await Task.Run(() => wait_value_state_async(this, state, time));
+        //public async Task<TValue> WaitValue(TValue state, int time) => (TValue)await Task.Run(() => wait_value_state_async(this, state, time));
+
+        public virtual TValue WaitValue(TValue state, int time)
+        {
+            return (TValue)wait_value_state(this, state, time);
+        }
+
+        public virtual async Task<TValue> WaitValueAsync(TValue state, int time)
+        {
+            return (TValue)await Task.Run(() => wait_value_state_async(this, state, time));
+        }
 
         public override void Select() => EventSelection?.Invoke(this);
     }
