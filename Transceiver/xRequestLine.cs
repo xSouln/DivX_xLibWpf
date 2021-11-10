@@ -27,7 +27,7 @@ namespace xLib.Transceiver
 
         public Func<xAction<bool, byte[]>> RequstTransmitter;
 
-        private static CancellationTokenSource cancel_token_source;
+        private CancellationTokenSource cancel_token_source;
 
         public List<xRequest> Requests
         {

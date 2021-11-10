@@ -2,7 +2,7 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:local="clr-namespace:xLib.xWindows.Resources">
 
-    <LinearGradientBrush x:Key="DarkBrush" StartPoint="0.5,0" EndPoint="0.5,1">
+    <LinearGradientBrush x:Key="MenuItemDarkBrush" StartPoint="0.5,0" EndPoint="0.5,1">
         <GradientBrush.GradientStops>
             <GradientStopCollection>
                 <GradientStop Color="#939393" Offset="0.0"/>
@@ -12,7 +12,7 @@
         </GradientBrush.GradientStops>
     </LinearGradientBrush>
 
-    <LinearGradientBrush x:Key="Clicked" StartPoint="0.5,0" EndPoint="0.5,1">
+    <LinearGradientBrush x:Key="MenuItemClicked" StartPoint="0.5,0" EndPoint="0.5,1">
         <GradientBrush.GradientStops>
             <GradientStopCollection>
                 <GradientStop Color="#363636" Offset="0.0"/>
@@ -20,33 +20,6 @@
             </GradientStopCollection>
         </GradientBrush.GradientStops>
     </LinearGradientBrush>
-
-
-    <Style x:Key="{x:Type Menu}" TargetType="Menu">
-        <Setter Property="OverridesDefaultStyle" Value="True"/>
-        <Setter Property="SnapsToDevicePixels" Value="True"/>
-        <Setter Property="Foreground" Value="White"/>
-        <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate TargetType="Menu">
-                    <Border x:Name="MainMenu" Background="#FF3F3F46">
-                        <StackPanel ClipToBounds="True" Orientation="Horizontal" IsItemsHost="True"/>
-                    </Border>
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
-    </Style>
-
-    <Style x:Key="CustomDataGridRowHeader" TargetType="DataGridRowHeader">
-        <Setter Property="Width" Value="25"/>
-        <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate>
-                    <Label FontSize="10" Margin="-4"/>
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
-    </Style>
 
     <ControlTemplate TargetType="{x:Type MenuItem}" x:Key="MenuItemControlTemplate1">
         <Border x:Name="templateRoot" 
@@ -92,7 +65,7 @@
                 <Setter Property="Canvas.Left" TargetName="OpaqueRect" Value="{Binding HorizontalOffset, ElementName=SubMenuScrollViewer}"/>
             </Trigger>
             <Trigger Property="IsKeyboardFocusWithin" Value="True">
-                <Setter TargetName="templateRoot" Property="Background" Value="{StaticResource Clicked}"/>
+                <Setter TargetName="templateRoot" Property="Background" Value="{StaticResource MenuItemClicked}"/>
                 <Setter Property="Header" Value="Test"/>
                 <Setter Property="BorderBrush" Value="#2C2C2C"></Setter>
                 <Setter Property="BorderThickness" Value="1"></Setter>

@@ -79,10 +79,10 @@ namespace xLib
 
                 if (is_connected != value)
                 {
-                    EventChangeConnectionState?.Invoke(this, value);
                     is_connected = value;
                     OnPropertyChanged(nameof(IsConnected));
                     OnPropertyChanged(nameof(SelectIsEnable));
+                    EventChangeConnectionState?.Invoke(this, value);
                 }
             }
         }

@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:xLib"
         mc:Ignorable="d"
-        Title="Tcp connection" Height="114.333" MinHeight="120" MaxHeight="120" Width="410" MinWidth="410" MaxWidth="410" Background="#FF3F3F46" FontSize="18">    
+        Title="Tcp connection" Height="130" MinHeight="130" MaxHeight="130" Width="410" MinWidth="410" MaxWidth="410" Background="#FF3F3F46" FontSize="18">    
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="240*"/>

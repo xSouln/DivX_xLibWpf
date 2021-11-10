@@ -11,7 +11,7 @@
         </GradientBrush.GradientStops>
     </LinearGradientBrush>
 
-    <LinearGradientBrush x:Key="DarkBrush" StartPoint="0.5,0" EndPoint="0.5,1">
+    <LinearGradientBrush x:Key="ButtonDarkBrush" StartPoint="0.5,0" EndPoint="0.5,1">
         <GradientBrush.GradientStops>
             <GradientStopCollection>
                 <GradientStop Color="#939393" Offset="0.0"/>
@@ -41,7 +41,7 @@
         <ControlTemplate.Triggers>
             <Trigger Property="IsMouseOver" Value="true">
                 <!--<Setter Property="FontWeight" Value="Bold" />-->
-                <Setter TargetName="buttonBorder" Property="Background" Value="{StaticResource DarkBrush}"/>
+                <Setter TargetName="buttonBorder" Property="Background" Value="{StaticResource ButtonDarkBrush}"/>
             </Trigger>
             <Trigger Property="IsPressed" Value="true">
                 <Setter TargetName="buttonBorder" Property="Background" Value="{StaticResource ButtonClicked}" />
