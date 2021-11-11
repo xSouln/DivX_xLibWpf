@@ -143,7 +143,7 @@ namespace xLib.Transceiver
             update_period = period;
             try
             {
-                _ = Task.Factory.StartNew(async () =>
+                var task = new Task(async () =>
                 {
                     Stopwatch stop_watch = new Stopwatch();
                     xAction<bool, byte[]> action_transmitter = transmitter;
@@ -175,14 +175,18 @@ namespace xLib.Transceiver
                                     );
                             }
                             else { Tracer?.Invoke("Transmition result: " + "null"); break; }
-                            end_foreach:;
+                        end_foreach:;
                         }
 
                         delay -= stop_watch.ElapsedMilliseconds;
-                        end_while: if (delay > 0) { await Task.Delay((int)delay); }
+                    end_while: if (delay > 0) { await Task.Delay((int)delay); }
                     }
                 },
-                cancel_token_source.Token);
+                cancel_token_source.Token,
+                TaskCreationOptions.LongRunning
+                );
+
+                task.Start();
             }
             catch { }
         }
