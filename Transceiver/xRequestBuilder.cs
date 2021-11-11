@@ -181,6 +181,7 @@ namespace xLib.Transceiver
                 Tracer = Tracer,
                 Handler = RequestHandler
             };
+
             RequestInfoT info = new RequestInfoT { Action = (ushort)(object)Action };
             List<byte> request_data = new List<byte>();
 
@@ -194,7 +195,7 @@ namespace xLib.Transceiver
 
         protected virtual unsafe object ParseRule(xResponse response, xContent content)
         {
-            ResponseT *packet = (ResponseT*)content.Obj;
+            ResponseT* packet = (ResponseT*)content.Obj;
             if (xConverter.Compare(response.Header, &packet->Prefix, sizeof(ResponsePrefixT))
                 && response is IResponseAction<TAction> value
                 && (ushort)(object)value.Action == packet->Info.Action)

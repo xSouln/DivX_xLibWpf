@@ -31,6 +31,7 @@ namespace xLib.Transceiver
         protected List<xRequest> requests = new List<xRequest>();
         protected AutoResetEvent read_write_synchronize = new AutoResetEvent(true);
         protected Semaphore queue_size;
+        protected Thread thread;
 
         public xRequestHandler(int line_size)
         {
@@ -41,6 +42,24 @@ namespace xLib.Transceiver
         public xRequestHandler()
         {
             queue_size = new Semaphore(10, 10);
+            //thread = new Thread(thread_handler);
+            //thread.Start();
+        }
+
+        private void thread_handler()
+        {
+            while (true)
+            {
+                read_write_synchronize.WaitOne();
+                /*
+                for ()
+                {
+
+                }
+                */
+                read_write_synchronize.Set();
+                Thread.Sleep(1);
+            }
         }
 
         protected virtual void requests_update()
@@ -83,16 +102,6 @@ namespace xLib.Transceiver
                 }
             }
             finally { read_write_synchronize.Set(); }
-        }
-
-        public void LineIn()
-        {
-            //queue_size.WaitOne();
-        }
-
-        public void LineOut()
-        {
-            //queue_size.Release();
         }
 
         public bool Identification(xContent content)
@@ -147,18 +156,16 @@ namespace xLib.Transceiver
         protected int response_time_out = 100;
         protected long response_time = 0;
         protected Timer timer_transmiter;
-        protected AutoResetEvent delay_handler = new AutoResetEvent(false);
         protected volatile ERequestState transmission_state;
 
         protected AutoResetEvent transmition_synchronize = new AutoResetEvent(true);
-        //protected Semaphore sTransmitAction = new Semaphore(1, 1);
-        //protected AutoResetEvent transmit_action_synchronize = new AutoResetEvent(true);
 
         protected volatile bool is_transmit_action;
         protected volatile bool is_accept;
         protected xResponse response;
 
         public xRequestHandler Handler;
+        public bool IsNotify = true;
 
         public byte[] Data;
 
@@ -166,14 +173,23 @@ namespace xLib.Transceiver
         public xEvent<xRequest> EventTimeOut;
 
         public xBuilderBase Builder { get; set; }
-        public string Name { get => Builder?.Name; }
-        public int ResponseTimeOut { get => response_time_out; }
-        public long ResponseTime { get => response_time; }
+
+        public string Name => Builder?.Name;
+
+        public int ResponseTimeOut => response_time_out;
+
+        public long ResponseTime => response_time;
+
         public int TryCount { get => try_count; set { if (try_count > 0) { try_count = value; } } }
-        public int TryNumber { get => try_number; }
+
+        public int TryNumber => try_number;
+
         public xAction<bool, byte[]> Transmitter { get => transmitter; set => transmitter = value; }
+
         public virtual xResponse Response { get => response; set => response = value; }
-        public ERequestState TransmissionState { get => transmission_state; }
+
+        public ERequestState TransmissionState => transmission_state;
+
 
         public void Accept()
         {
@@ -190,7 +206,6 @@ namespace xLib.Transceiver
 
         protected static void transmit_action(xRequest request)
         {
-            //xRequest request = (xRequest)arg;
             request.transmition_synchronize.WaitOne();
             try
             {
@@ -232,11 +247,11 @@ namespace xLib.Transceiver
                 try_number = 0;
                 response_time = 0;
 
-                Stopwatch time_transmition = new Stopwatch();
-                Stopwatch time_transmit_action = new Stopwatch();
-
                 transmission_state = ERequestState.IsTransmit;
                 transmition_synchronize.Set();
+
+                Stopwatch time_transmition = new Stopwatch();
+                Stopwatch time_transmit_action = new Stopwatch();
 
                 time_transmition.Start();
                 do
@@ -246,7 +261,46 @@ namespace xLib.Transceiver
                     while (transmission_state == ERequestState.IsTransmit && time_transmit_action.ElapsedMilliseconds < response_time_out)
                     {
                         Thread.Sleep(1);
-                        //await Task.Delay(1);
+                    }
+                }
+                while (transmission_state == ERequestState.IsTransmit);
+
+                time_transmition.Stop();
+                time_transmit_action.Stop();
+                response_time = time_transmition.ElapsedMilliseconds;
+                return this;
+            }
+            finally { transmition_synchronize.Set(); }
+        }
+
+        protected virtual async Task<xRequest> transmition_async()
+        {
+            try
+            {
+                transmition_synchronize.WaitOne();
+
+                if (transmission_state != ERequestState.Free) { return this; }
+
+                transmission_state = ERequestState.Prepare;
+                if (!(bool)Handler?.Add(this)) { transmission_state = ERequestState.Busy; return this; };
+
+                try_number = 0;
+                response_time = 0;
+
+                transmission_state = ERequestState.IsTransmit;
+                transmition_synchronize.Set();
+
+                Stopwatch time_transmition = new Stopwatch();
+                Stopwatch time_transmit_action = new Stopwatch();
+
+                time_transmition.Start();
+                do
+                {
+                    transmit_action(this);
+                    time_transmit_action.Restart();
+                    while (transmission_state == ERequestState.IsTransmit && time_transmit_action.ElapsedMilliseconds < response_time_out)
+                    {
+                        await Task.Delay(1);
                     }
                 }
                 while (transmission_state == ERequestState.IsTransmit);
@@ -292,7 +346,8 @@ namespace xLib.Transceiver
             this.try_number = 0;
             this.response.Result = null;
 
-            var result = await Task.Run(() => transmition());
+            //var result = await Task.Run(() => transmition());
+            var result = await Task.Run(() => transmition_async());
             return result;
         }
     }
@@ -325,7 +380,8 @@ namespace xLib.Transceiver
             this.try_number = 0;
             this.response.Result = null;
 
-            var result = await Task.Run(() => transmition());
+            //var result = await Task.Run(() => transmition());
+            var result = await Task.Run(() => transmition_async());
             return (xRequest<TResult>)result;
         }
     }

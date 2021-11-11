@@ -5,10 +5,11 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using xLib.UI_Propertys;
 
 namespace xLib.Transceiver
 {
-    public class xRequestLine
+    public class xRequestLine : NotifyPropertyChanged
     {
         public class Result
         {
@@ -23,6 +24,7 @@ namespace xLib.Transceiver
         private int try_count = 1;
         private int response_time_out = 300;
         private int update_period = 1000;
+        private bool update_enable;
         private List<xRequest> requests;
 
         public Func<xAction<bool, byte[]>> RequstTransmitter;
@@ -37,20 +39,26 @@ namespace xLib.Transceiver
 
         public xAction<bool, byte[]> Transmitter
         {
+            get => transmitter;
             set { if (value != null) { transmitter = value; } }
-            get { return transmitter; }
         }
 
         public int TryCount
         {
-            get { return try_count; }
+            get => try_count;
             set { if (value > 0) { try_count = value; } }
         }
 
         public int ResponseTimeOut
         {
-            get { return response_time_out; }
+            get => response_time_out;
             set { if (value >= 100) { response_time_out = value; } }
+        }
+
+        public bool UpdateEnable
+        {
+            get { return update_enable; }
+            set { update_enable = value; OnPropertyChanged(nameof(UpdateEnable)); }
         }
 
         public xRequestLine() { Dispose(); }
@@ -135,20 +143,25 @@ namespace xLib.Transceiver
             update_period = period;
             try
             {
-                Task.Factory.StartNew(async () =>
+                _ = Task.Factory.StartNew(async () =>
                 {
                     Stopwatch stop_watch = new Stopwatch();
                     xAction<bool, byte[]> action_transmitter = transmitter;
                     long delay;
+                    UpdateEnable = true;
 
                     while (true)
                     {
                         delay = update_period;
+
+                        if (!UpdateEnable) { goto end_while; }
                         if (RequstTransmitter != null) { action_transmitter = RequstTransmitter(); }
 
                         stop_watch.Restart();
                         foreach (xRequest request in requests)
                         {
+                            if (!request.IsNotify) { goto end_foreach; }
+
                             request.Break();
                             stop_watch.Start();
                             var transmition_result = await request.TransmitionAsync(action_transmitter, try_count, response_time_out);
@@ -162,10 +175,11 @@ namespace xLib.Transceiver
                                     );
                             }
                             else { Tracer?.Invoke("Transmition result: " + "null"); break; }
+                            end_foreach:;
                         }
 
                         delay -= stop_watch.ElapsedMilliseconds;
-                        if (delay > 0) { await Task.Delay((int)delay); }
+                        end_while: if (delay > 0) { await Task.Delay((int)delay); }
                     }
                 },
                 cancel_token_source.Token);
