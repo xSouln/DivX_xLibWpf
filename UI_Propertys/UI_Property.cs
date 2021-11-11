@@ -38,8 +38,6 @@ namespace xLib.UI_Propertys
 
     public class UI_Property : NotifyPropertyChanged
     {
-        public delegate void xEventChanged<TProperty>(TProperty property);
-        public delegate void xEventBackgroundChanged<TProperty>(TProperty property);
         public delegate Brush xBackgroundRule<TProperty>(TProperty property);
         public delegate TValue ParseRule<TValue>(TValue last, TValue request);
 
