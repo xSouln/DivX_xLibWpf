@@ -30,6 +30,7 @@ namespace xLib
         public ushort Size { get; set; }
 
         public unsafe int GetSize() => sizeof(RequestInfoT);
+        public void SetSize(int size) { Size = (ushort)size; }
 
         public void GetData(List<byte> data)
         {
@@ -43,12 +44,13 @@ namespace xLib
     }
 
     public interface IResponseInfo { ushort Action { get; set; } ushort Size { get; set; } }
-    public interface IResponseAction { ushort Action { get; set; } }
-    public struct ResponseInfoT : IResponseAction, IDataProvider
+    public interface IResponseAction<TAction> { TAction Action { get; set; } }
+    public struct ResponseInfoT : IResponseAction<ushort>, IDataProvider
     {
         public ushort Action { get; set; }
         public ushort Size { get; set; }
         public unsafe int GetSize() => sizeof(RequestInfoT);
+        public void SetSize(int size) { Size = (ushort)size; }
 
         public void GetData(List<byte> data)
         {
@@ -62,7 +64,7 @@ namespace xLib
     }
 
     public interface IResponseError { ushort Error { get; set; } }
-    public struct ResponseErrorT: IResponseAction, IResponseError
+    public struct ResponseErrorT: IResponseAction<ushort>, IResponseError
     {
         public ushort Action { get; set; }
         public ushort Error { get; set; }

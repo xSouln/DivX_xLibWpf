@@ -52,6 +52,6 @@ namespace xLib
         }
 
         public static void Close_Click(object sender, EventArgs e) { window?.Close(); window = null; }
-        public static void Dispose() { Tcp?.Disconnect(); window?.Close(); window = null; }
+        public static void Dispose() { window?.Close(); window = null; }
     }
 }

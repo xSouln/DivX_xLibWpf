@@ -12,95 +12,179 @@ namespace xLib.Transceiver
         unsafe bool Identification(xContent content);
         unsafe void Receive(xContent content);
     }
-    public interface IResponseInfo<TResponseInfo> where TResponseInfo : unmanaged, IResponseAction
+
+    public interface IContentSeter
     {
-        TResponseInfo Info { get; set; }
+        object SetContent(xContent content);
     }
 
-    public class xResponse : NotifyPropertyChanged, IResponseControl
+    public class xResponseResult : IContentSeter
+    {
+        public xContent Content;
+
+        public virtual object SetContent(xContent content)
+        {
+            Content = content;
+            return this;
+        }
+    }
+
+    public abstract class xResponse : NotifyPropertyChanged
     {
         public const char START_CHARECTER = '#';
-        public class ParseCallback { public xContent Content; }
 
-        public unsafe delegate ParseCallback DParseRule<TResponse>(TResponse response, xContent content);
-        public unsafe delegate bool DReceiver<TRequest, TContent>(TRequest request, xContent content, TContent* obj) where TContent : unmanaged;
+        public delegate object DParseRule<TResponse>(TResponse response, xContent content);
+        public delegate bool DReceiver<TResponse, TResult>(TResponse response, TResult packet);
 
-        public xResponse() { }
+        protected string name = "";
+        protected string header = "";
+        protected xResponseResult result;
+
+        public object Context;
+        public bool IsAccepted;
+        public DParseRule<xResponse> ParseRule;
+        public DReceiver<xResponse, xResponseResult> EventReceive;
+        //protected object event_receive;
+        public xEvent<string> Tracer;
+
+        public xResponse(List<xResponse> responses) { responses?.Add(this); }
+
         public xResponse(xResponse response)
         {
             name = response.name;
             header = response.header;
-            ParseRule = response.ParseRule;
             EventReceive = response.EventReceive;
+            ParseRule = response.ParseRule;
+            Tracer = response.Tracer;
         }
 
-        protected string name = "";
-        protected string header = "";
-
-        public DParseRule<xResponse> ParseRule;
-        public DReceiver<xResponse, byte> EventReceive;
-        public xEvent Tracer;
+        public xResponse(List<xResponse> responses, xResponse response) : this(response)
+        {
+            responses?.Add(this);
+        }
 
         public virtual string Name
         {
             get { return name; }
             set { name = value; OnPropertyChanged(nameof(Name)); }
         }
+
         public virtual string Header
         {
             get { return header; }
             set { header = value; OnPropertyChanged(nameof(Header)); }
         }
 
-        public virtual unsafe bool Identification(xContent content)
+        public virtual xResponseResult Result
+        {
+            get { return result; }
+            set { result = value; }
+        }
+
+        public virtual bool Identification(xContent content)
         {
             if (ParseRule != null)
             {
-                ParseCallback callback = ParseRule(this, content);
-                if (callback != null) { Receive(callback.Content); return true; }
+                object parse_content = ParseRule(this, content);
+                if (parse_content != null)
+                {
+                    result = (xResponseResult)new xResponseResult().SetContent((xContent)parse_content);
+                    IsAccepted = (bool)(EventReceive?.Invoke(this, result));
+                    return IsAccepted;
+                }
             }
             return false;
         }
 
-        public unsafe virtual void Receive(xContent content) { Tracer?.Invoke("Receive" + name); EventReceive?.Invoke(this, content, content.Obj); }
+        public virtual void Receive(xContent content)
+        {
+            Tracer?.Invoke("Receive" + name);
+            IsAccepted = true;
+            result = (xResponseResult)new xResponseResult().SetContent(content);
+            EventReceive?.Invoke(this, result);
+        }
+
+        public virtual void Receive(object context, xContent content)
+        {
+            Context = context;
+            Receive(content);
+        }
     }
 
-    public class xResponse<TContent> : xResponse where TContent : unmanaged
+    public class xResponse<TResult> : xResponse, IResponseControl where TResult : xResponseResult, new()
     {
-        public new DParseRule<xResponse<TContent>> ParseRule;
-        public new DReceiver<xResponse<TContent>, TContent> EventReceive;
+        public new DParseRule<xResponse<TResult>> ParseRule;
+        public new DReceiver<xResponse<TResult>, TResult> EventReceive;
 
-        public override unsafe bool Identification(xContent content)
+        public xResponse(List<xResponse> responses) : base(responses) { }
+
+        public xResponse(xResponse<TResult> response) : base(response) { ParseRule = response.ParseRule; EventReceive = response.EventReceive; }
+
+        public xResponse(List<xResponse> responses, xResponse<TResult> response) : base(responses, response) { ParseRule = response.ParseRule; EventReceive = response.EventReceive; }
+
+        public new virtual TResult Result
+        {
+            get { return (TResult)result; }
+            set { result = value; }
+        }
+
+        public override bool Identification(xContent content)
         {
             if (ParseRule != null)
             {
-                ParseCallback callback = ParseRule(this, content);
-                if (callback != null) { return (bool)(EventReceive?.Invoke(this, callback.Content, (TContent*)callback.Content.Obj)); }
+                object parse_content = ParseRule(this, content);
+                if (parse_content != null)
+                {
+                    result = (TResult)new TResult().SetContent((xContent)parse_content);
+                    if (EventReceive != null)
+                    {
+                        IsAccepted = EventReceive(this, (TResult)result);
+                        return IsAccepted;
+                    }
+                    return true;
+                }
             }
             return false;
         }
 
-        public unsafe override void Receive(xContent content) { Tracer?.Invoke("Receive" + name); EventReceive?.Invoke(this, content, (TContent*)content.Obj); }
+        public override void Receive(xContent content)
+        {
+            Tracer?.Invoke("Receive" + name);
+            result = (TResult)new TResult().SetContent(content);
+            EventReceive?.Invoke(this, (TResult)result);
+        }
     }
 
-    public class xResponse<TContent, TResponseInfo> : xResponse, IResponseAction, IResponseInfo<TResponseInfo> where TContent : unmanaged where TResponseInfo : unmanaged, IResponseAction
+    public class xResponse<TResult, TAction> : xResponse<TResult>, IResponseAction<TAction> where TResult : xResponseResult, new()
     {
-        public TResponseInfo Info { get; set; }
-        public ushort Action { get { return Info.Action; } set { } }
+        public new DReceiver<xResponse<TResult, TAction>, TResult> EventReceive;
 
-        public new DParseRule<xResponse<TContent, TResponseInfo>> ParseRule;
-        public new DReceiver<xResponse<TContent, TResponseInfo>, TContent> EventReceive;
+        public xResponse(List<xResponse> responses, TAction action) : base(responses) { name = "" + action; Action = action; }
 
-        public override unsafe bool Identification(xContent content)
+        public xResponse(List<xResponse> responses, xResponse<TResult, TAction> response) : base(responses, response) { Action = response.Action; EventReceive = response.EventReceive; }
+
+        public TAction Action { get; set; }
+
+        public override bool Identification(xContent content)
         {
-            if (ParseRule != null)
+            if (ParseRule != null && EventReceive != null)
             {
-                ParseCallback callback = ParseRule(this, content);
-                if (callback != null) { return (bool)(EventReceive?.Invoke(this, callback.Content, (TContent*)callback.Content.Obj)); }
+                object parse_content = ParseRule(this, content);
+                if (parse_content != null)
+                {
+                    result = (TResult)new TResult().SetContent((xContent)parse_content);
+                    IsAccepted = EventReceive(this, (TResult)result);
+                    return IsAccepted;
+                }
             }
             return false;
         }
 
-        public override unsafe void Receive(xContent content) { Tracer?.Invoke("Receive" + name); EventReceive?.Invoke(this, content, (TContent*)content.Obj); }
+        public override void Receive(xContent content)
+        {
+            Tracer?.Invoke("Receive" + name);
+            result = (TResult)new TResult().SetContent(content);
+            EventReceive?.Invoke(this, (TResult)result);
+        }
     }
 }

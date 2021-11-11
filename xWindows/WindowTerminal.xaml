@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:xLib"
         mc:Ignorable="d"
-        Title="Terminal" Height="894.5" Width="1682.5" Background="#FF3F3F46">
+        Title="Terminal" Height="894.5" Width="1142.5" Background="#FF3F3F46">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="365*"/>
@@ -39,9 +39,9 @@
                         </ListView.Resources>
                         <ListView.View>
                             <GridView>
-                                <GridViewColumn Header="Time" DisplayMemberBinding="{Binding Time}" Width="200"/>
-                                <GridViewColumn Header="Type" DisplayMemberBinding="{Binding Note}" Width="150"/>
-                                <GridViewColumn Header="Note" DisplayMemberBinding="{Binding Data}" Width="400"/>
+                                <GridViewColumn Header="Time" DisplayMemberBinding="{Binding Time}" Width="180"/>
+                                <GridViewColumn Header="Type" DisplayMemberBinding="{Binding Note}" Width="100"/>
+                                <GridViewColumn Header="Note" DisplayMemberBinding="{Binding Data}" Width="600"/>
                                 <GridViewColumn Header="Data" DisplayMemberBinding="{Binding ConvertData}" Width="500"/>
                             </GridView>
                         </ListView.View>
@@ -71,9 +71,9 @@
                         </ListView.Resources>
                         <ListView.View>
                             <GridView>
-                                <GridViewColumn Header="Time" DisplayMemberBinding="{Binding Time}" Width="200"/>
-                                <GridViewColumn Header="Type" DisplayMemberBinding="{Binding Note}" Width="150"/>
-                                <GridViewColumn Header="Note" DisplayMemberBinding="{Binding Data}" Width="400"/>
+                                <GridViewColumn Header="Time" DisplayMemberBinding="{Binding Time}" Width="180"/>
+                                <GridViewColumn Header="Type" DisplayMemberBinding="{Binding Note}" Width="100"/>
+                                <GridViewColumn Header="Note" DisplayMemberBinding="{Binding Data}" Width="600"/>
                                 <GridViewColumn Header="Data" DisplayMemberBinding="{Binding ConvertData}" Width="700"/>
                             </GridView>
                         </ListView.View>
@@ -114,7 +114,10 @@
             </TabItem>
         </TabControl>
         <TextBox x:Name="TextBoxData" Margin="5,5,10,5" Grid.Row="1" TextWrapping="Wrap" SelectionOpacity="0" BorderBrush="#FFB26A22" Background="{x:Null}" Foreground="#FFDEC316" FontSize="20" TextAlignment="Right"/>
-        <Button x:Name="ButSend" Content="Send" Margin="10,5" BorderBrush="#FFB26A22" Background="#FF4F4F4F" FontSize="20" Foreground="#FFDEC316" Click="ButSend_Click" Grid.Column="1" Grid.Row="1">
+        <Button x:Name="ButSend" Content="Send" Margin="10,5" BorderBrush="#FFB26A22" Template="{DynamicResource ButtonTemplate1}" Background="#FF4F4F4F" FontSize="20" Foreground="#FFDEC316" Grid.Column="1" Grid.Row="1" Click="ButSend_Click">
+            
+        </Button>
+        <Button x:Name="ButPause" Background="{Binding Background}" Content="{Binding Name}" Template="{DynamicResource ButtonTemplate1}" Click="ButPause_Click" Margin="10,35,10,0" BorderBrush="#FFB26A22" FontSize="20" Foreground="#FFDEC316" RenderTransformOrigin="4.725,4.075" Grid.Column="1" Height="40" VerticalAlignment="Top">
             <Button.Resources>
                 <Style TargetType="{x:Type Button}">
                     <Style.Triggers>
@@ -128,33 +131,8 @@
                 </Style>
             </Button.Resources>
         </Button>
-        <Button x:Name="ButPause" Content="Pause" Margin="10,35,0,738" BorderBrush="#FFB26A22" Background="#FF4F4F4F" FontSize="20" Foreground="#FFDEC316" HorizontalAlignment="Left" Width="180" RenderTransformOrigin="4.725,4.075" Grid.Column="1" Click="ButPause_Click">
-            <Button.Resources>
-                <Style TargetType="{x:Type Button}">
-                    <Style.Triggers>
-                        <Trigger Property="IsFocused" Value="True">
-                            <Setter Property="Background" Value="DarkBlue"/>
-                        </Trigger>
-                        <Trigger Property="IsMouseOver" Value="True">
-                            <Setter Property="Background" Value="DarkBlue"/>
-                        </Trigger>
-                    </Style.Triggers>
-                </Style>
-            </Button.Resources>
-        </Button>
-        <Button x:Name="ButClear" Content="Clear" Margin="10,80,0,693" BorderBrush="#FFB26A22" Background="#FF4F4F4F" FontSize="20" Foreground="#FFDEC316" HorizontalAlignment="Left" Width="180" RenderTransformOrigin="4.725,4.075" Grid.Column="1" Click="ButClear_Click">
-            <Button.Resources>
-                <Style TargetType="{x:Type Button}">
-                    <Style.Triggers>
-                        <Trigger Property="IsFocused" Value="True">
-                            <Setter Property="Background" Value="DarkBlue"/>
-                        </Trigger>
-                        <Trigger Property="IsMouseOver" Value="True">
-                            <Setter Property="Background" Value="DarkBlue"/>
-                        </Trigger>
-                    </Style.Triggers>
-                </Style>
-            </Button.Resources>
+        <Button x:Name="ButClear" Content="Clear" Template="{DynamicResource ButtonTemplate1}" Margin="10,80,10,0" BorderBrush="#FFB26A22" Background="#FF4F4F4F" FontSize="20" Foreground="#FFDEC316" RenderTransformOrigin="4.725,4.075" Grid.Column="1" Click="ButClear_Click" Height="40" VerticalAlignment="Top">
+            
         </Button>
     </Grid>
 </Window>

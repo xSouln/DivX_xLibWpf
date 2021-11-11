@@ -14,8 +14,6 @@ namespace xLib
         public xContent Content;
     }
 
-    public delegate void xReceiverCallback(xReceiverData ReceiverData);
-
     public class xReceiver
     {
         public struct xReceiverBufT
@@ -26,31 +24,29 @@ namespace xLib
 
         public xEvent<xReceiverData> EventPacketReceive;
 
-        public byte[] end_line;
+        public byte[] EndLine;
         public xReceiverBufT Buf = new xReceiverBufT();
-
         public xRxResponse Response = xRxResponse.Accept;
-        public bool Loock = false;
+        public object Context;
 
         public xReceiver(int BufSize, byte[] EndLine)
         {
-            end_line = EndLine;
+            this.EndLine = EndLine;
             Buf.Data = new byte[BufSize];
             Buf.ByteRecived = 0;
 
-            if (end_line == null) end_line = new byte[] { (byte)'\r' };
+            if (this.EndLine == null) { this.EndLine = new byte[] { (byte)'\r' }; }
         }
         private unsafe void BufLoaded()
         {
             if (EventPacketReceive != null)
             {
-                Response = xRxResponse.Accept;
                 xReceiverData data = new xReceiverData();
                 data.xRx = this;
                 data.Content.Size = Buf.ByteRecived;
                 fixed (byte* ptr = Buf.Data) { data.Content.Obj = ptr; EventPacketReceive(data); }
             }
-            if (Response == xRxResponse.Accept) { Buf.ByteRecived = 0; }
+            Buf.ByteRecived = 0;
         }
 
         private unsafe void EndLineIdentify()
@@ -60,11 +56,11 @@ namespace xLib
                 Response = xRxResponse.Accept;
                 xReceiverData data = new xReceiverData();
                 data.xRx = this;
-                data.Content.Size = Buf.ByteRecived - end_line.Length;
+                data.Content.Size = Buf.ByteRecived - EndLine.Length;
                 fixed (byte* ptr = Buf.Data) { data.Content.Obj = ptr; EventPacketReceive(data); }
             }
+
             if (Response == xRxResponse.Accept) { Buf.ByteRecived = 0; }
-            else { }
         }
 
         public void Add(byte data)
@@ -72,27 +68,26 @@ namespace xLib
             Buf.Data[Buf.ByteRecived] = data;
             Buf.ByteRecived++;
 
-            if (Buf.ByteRecived > end_line.Length) {
-                int i = end_line.Length;
+            if (Buf.ByteRecived > EndLine.Length) {
+                int i = EndLine.Length;
                 int j = Buf.ByteRecived;
                 while (i > 0)
                 {
                     i--;
                     j--;
-                    if (end_line[i] != Buf.Data[j]) { goto verify_end; }
+                    if (EndLine[i] != Buf.Data[j]) { goto verify_end; }
                 }
                 EndLineIdentify();
             }
 
         verify_end:
-            if (Buf.ByteRecived == Buf.Data.Length) { BufLoaded(); Buf.ByteRecived = 0; }
+            if (Buf.ByteRecived == Buf.Data.Length) { BufLoaded(); }
         }
 
         public void Clear()
         {
             Response = xRxResponse.Accept;
             Buf.ByteRecived = 0;
-            Loock = false;
         }
     }
 }

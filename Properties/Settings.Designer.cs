@@ -22,5 +22,28 @@ namespace xLib.Properties {
                 return defaultInstance;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        public global::xLib.xSerialPortOptions SerialPortOptions {
+            get {
+                return ((global::xLib.xSerialPortOptions)(this["SerialPortOptions"]));
+            }
+            set {
+                this["SerialPortOptions"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("192.168.0.68:5000")]
+        public string TcpAddress {
+            get {
+                return ((string)(this["TcpAddress"]));
+            }
+            set {
+                this["TcpAddress"] = value;
+            }
+        }
     }
 }

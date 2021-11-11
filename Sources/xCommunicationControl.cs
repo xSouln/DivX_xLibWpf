@@ -23,7 +23,7 @@ namespace xLib.Sources
         public Brush Background
         {
             get { return background; }
-            set { if (background != value) { background = value; OnPropertyChanged(nameof(Background)); } }
+            set { background = value; OnPropertyChanged(nameof(Background)); }
         }
 
         public bool IsAvailable
@@ -31,8 +31,8 @@ namespace xLib.Sources
             get { return is_available; }
             set
             {
-                if (value && background != background_true) { background = background_true; }
-                else if(!value && background != background_false) { background = background_false; }
+                if (value && background != background_true) { Background = background_true; }
+                else if(!value && background != background_false) { Background = background_false; }
 
                 if (is_available != value)
                 {
@@ -43,11 +43,14 @@ namespace xLib.Sources
             }
         }
 
-        public void StartControl(int period)
+        public void StartControl(int update_period)
         {
-            if (period < 100) { period = 100; }
-            timer = new Timer(update_state, null, 0, period);
+            if (update_period < 100) { update_period = 100; }
+            timer = new Timer(update_state, null, 0, update_period);
         }
+
+        public xCommunicationControl() { StartControl(2000); }
+        public xCommunicationControl(int update_period) { StartControl(update_period); }
 
         public void Dispose() { timer?.Dispose(); }
 

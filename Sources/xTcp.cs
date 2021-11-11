@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
@@ -13,17 +14,17 @@ namespace xLib
 {
     public class xTcp : NotifyPropertyChanged
     {
-        private object state_background;
+        private object background_state;
 
-        public xEvent EventDisconnected;
-        public xEvent EventConnected;
+        public xEvent<xTcp> EventDisconnected;
+        public xEvent<xTcp> EventConnected;
 
         public xAction<string> Tracer;
         private TcpClient client;
         private NetworkStream stream;
-        private Thread server_thread;
+        private Thread client_thread;
 
-        public string LastAddress;
+        private string last_address;
         public string Ip;
         public int Port;
         public bool is_connected = false;
@@ -34,13 +35,23 @@ namespace xLib
 
         public xTcp()
         {
-            Background = UI_Property.RED;
+            BackgroundState = UI_Property.RED;
         }
 
-        public object Background
+        public object BackgroundState
         {
-            set { state_background = value; OnPropertyChanged(nameof(Background)); }
-            get { return state_background; }
+            set { background_state = value; OnPropertyChanged(nameof(BackgroundState)); }
+            get { return background_state; }
+        }
+
+        public string LastAddress
+        {
+            get { return last_address; }
+            set
+            {
+                last_address = value;
+                OnPropertyChanged(nameof(LastAddress));
+            }
         }
 
         public bool IsConnected
@@ -52,21 +63,24 @@ namespace xLib
                 {
                     is_connected = value;
 
-                    if (is_connected) { Background = UI_Property.GREEN; EventConnected?.Invoke(this); }
-                    else { Background = UI_Property.RED; EventDisconnected?.Invoke(this); }
+                    if (value) { EventConnected?.Invoke(this); }
+                    else { EventDisconnected?.Invoke(this); }
                     OnPropertyChanged(nameof(IsConnected));
-                }                
+                }
+
+                if (is_connected && background_state != UI_Property.GREEN) { BackgroundState = UI_Property.GREEN; }
+                else if (!is_connected && background_state != UI_Property.RED) { BackgroundState = UI_Property.RED; }
             }
         }
 
         private void rx_thread()
         {
-            if (client == null) { trace("tcp: client == null"); thread_close(); }
+            if (client == null) { trace("tcp client: client == null"); thread_close(); }
             try
             {
                 stream = client.GetStream();
                 IsConnected = true;
-                trace("tcp: thread start");
+                trace("tcp client: thread start");
 
                 int count = 0;
                 byte[] buf = new byte[100000];
@@ -85,16 +99,12 @@ namespace xLib
             catch (Exception e) { trace(e.ToString()); thread_close(); }
         }
 
-        private bool thread_close()
+        private void thread_close()
         {
             if (stream != null) { stream.Flush(); stream.Close(); stream = null; }
             if (client != null) { client.Client?.Close(); client.Close(); client = null; }
-            server_thread?.Abort();
-            server_thread = null;
-            trace("tcp: thread close");
-
-            IsConnected = false;
-            return true;
+            try { client_thread?.Abort(); }
+            finally { trace("tcp client: thread close"); client_thread = null; IsConnected = false; }
         }
 
         private void request_callback(IAsyncResult ar)
@@ -102,13 +112,13 @@ namespace xLib
             try
             {
                 client = (TcpClient)ar.AsyncState;
-                if (client != null) { trace("tcp: client connected"); server_thread = new Thread(new ThreadStart(rx_thread)); server_thread.Start(); }
-                else trace("tcp: client connect error");
+                if (client != null) { trace("tcp: client connected"); client_thread = new Thread(new ThreadStart(rx_thread)); client_thread.Start(); }
+                else trace("tcp client: client connect error");
             }
             catch (Exception ex)
             {
                 trace(ex.ToString());
-                trace("tcp: client connect abort");
+                trace("tcp client: client connect abort");
                 thread_close();
                 return;
             }
@@ -118,15 +128,17 @@ namespace xLib
         {
             string[] strs;
 
-            if (client != null) { trace("tcp: device is connected"); return; }
-            trace("tcp: request connect");
+            if (address == null) { trace("tcp client: address == null"); return; }
 
-            if (address.Length < 9) { trace("tcp: incorrect parameters"); return; }
+            if (client != null) { trace("tcp client: device is connected"); return; }
+            trace("tcp client: request connect");
+
+            if (address.Length < 9) { trace("tcp client: incorrect parameters"); return; }
             strs = address.Split('.');
-            if (strs.Length < 4) { trace("tcp: incorrect parameters"); return; }
+            if (strs.Length < 4) { trace("tcp client: incorrect parameters"); return; }
 
             strs = address.Split(':');
-            if (strs.Length != 2) { trace("tcp: incorrect parameters"); return; }
+            if (strs.Length != 2) { trace("tcp client: incorrect parameters"); return; }
 
             int port = Convert.ToInt32(strs[1]);
             string ip = strs[0];
@@ -137,13 +149,13 @@ namespace xLib
 
             LastAddress = address;
 
-            trace("tcp: client begin connect");
+            trace("tcp client: client begin connect");
             IAsyncResult result = client.BeginConnect(Ip, Port, request_callback, client);
         }
         //=====================================================================================================================
         public void Disconnect()
         {
-            trace("tcp: request disconnect");
+            trace("tcp client: request disconnect");
             thread_close();
         }
         //=====================================================================================================================
@@ -152,10 +164,10 @@ namespace xLib
             if (client != null && stream != null && client.Connected)
             {
                 byte[] data = Encoding.UTF8.GetBytes(str + "\r");
-                trace("tcp send: " + str);
+                trace("tcp client send: " + str);
 
                 try { stream.Write(data, 0, data.Length); return true; }
-                catch { trace("tcp: невозможно отправить на указаный ip"); return false; }
+                catch { trace("tcp client: невозможно отправить на указаный ip"); return false; }
             }
             //trace("tcp: нет соединения");
             return false;
@@ -166,11 +178,12 @@ namespace xLib
             if (client != null && stream != null && client.Connected && data != null && data.Length > 0)
             {
                 try { stream.Write(data, 0, data.Length); return true; }
-                catch { trace("tcp: невозможно отправить на указаный ip"); return false; }
+                catch { trace("tcp client: невозможно отправить на указаный ip"); return false; }
             }
             //trace("tcp: нет соединения");
             return false;
         }
+        //=====================================================================================================================
         //=====================================================================================================================
     }
 }
