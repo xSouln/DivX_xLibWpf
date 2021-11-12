@@ -366,8 +366,8 @@ namespace xLib.Transceiver
             this.try_number = 0;
             this.response.Result = null;
 
-            //var result = await Task.Run(() => transmition());
-            var result = await Task.Run(() => transmition_async());
+            var result = await Task.Run(() => transmition());
+            //var result = await Task.Run(() => transmition_async());
             return result;
         }
     }
@@ -400,8 +400,8 @@ namespace xLib.Transceiver
             this.try_number = 0;
             this.response.Result = null;
 
-            //var result = await Task.Run(() => transmition());
-            var result = await Task.Run(() => transmition_async());
+            var result = await Task.Run(() => transmition());
+            //var result = await Task.Run(() => transmition_async());
             return (xRequest<TResult>)result;
         }
     }

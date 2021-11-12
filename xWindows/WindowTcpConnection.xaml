@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:xLib"
         mc:Ignorable="d"
-        Title="Tcp connection" Height="130" MinHeight="130" MaxHeight="130" Width="410" MinWidth="410" MaxWidth="410" Background="#FF3F3F46" FontSize="18">    
+        Title="Tcp connection" Height="130" MinHeight="140" MaxHeight="140" Width="410" MinWidth="410" MaxWidth="410" Background="#FF3F3F46" FontSize="18">    
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="240*"/>
@@ -16,8 +16,8 @@
             <RowDefinition Height="45*" MinHeight="45" MaxHeight="45"/>
             <RowDefinition Height="26*"/>
         </Grid.RowDefinitions>
-        <TextBox x:Name="TextBoxAddress" Margin="5" TextWrapping="Wrap" Background="{Binding BackgroundState}" FontSize="18" Foreground="#FFDEC316" BorderBrush="#FFA07B5C" Text="{Binding LastAddress}"/>
-        <Button x:Name="BotTcpConnect" Content="Connect" Template="{DynamicResource ButtonTemplate1}" Background="#FF4F4F4F" BorderBrush="#FFA07B5C" FontSize="16" Foreground="#FFDEC316" Grid.Column="1" Margin="5" Click="BotTcpConnect_Click" />
-        <Button x:Name="BotTcpDisconnect" Content="Disconnect" Template="{DynamicResource ButtonTemplate1}" Background="#FF4F4F4F" BorderBrush="#FFA07B5C" FontSize="16" Foreground="#FFDEC316" Grid.Column="1" Margin="5" Grid.Row="1" Click="BotTcpDisconnect_Click" />
+        <TextBox x:Name="TextBoxAddress" Margin="5" TextWrapping="Wrap" Background="{Binding BackgroundState}" FontSize="20" Foreground="#FFDEC316" BorderBrush="#FF834545" Text="{Binding LastAddress}"/>
+        <Button x:Name="BotTcpConnect" Content="Connect" Template="{DynamicResource ButtonTemplate1}" Background="#FF4F4F4F" FontSize="18" Foreground="#FFDEC316" Grid.Column="1" Margin="5" Click="BotTcpConnect_Click" />
+        <Button x:Name="BotTcpDisconnect" Content="Disconnect" Template="{DynamicResource ButtonTemplate1}" Background="#FF4F4F4F" FontSize="18" Foreground="#FFDEC316" Grid.Column="1" Margin="5" Grid.Row="1" Click="BotTcpDisconnect_Click" />
     </Grid>
 </Window>
