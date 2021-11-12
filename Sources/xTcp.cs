@@ -138,11 +138,11 @@ namespace xLib
                 if (client != null)
                 {
                     trace("tcp: client connected");
-
+                    /*
                     transmit_line.Clear();
                     transmit_line_thread = new Thread(transmit_line_thread_handler);
                     transmit_line_thread.Start();
-
+                    */
                     client_thread = new Thread(new ThreadStart(rx_thread));
                     client_thread.Start();
                 }
