@@ -28,8 +28,7 @@ namespace xLib
                     {
                         Time = DateTime.Now.ToUniversalTime().ToString(),
                         Note = note,
-                        Data = data,
-                        ConvertData = convert_data
+                        Data = data
                     });
                 }, null);
             }

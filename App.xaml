@@ -6,8 +6,10 @@
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="xWindows/Resources/ButtonPattern.xaml"/>
-                <ResourceDictionary Source="xWindows/Resources/TextBoxPattern.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/xLibWpf;component/xWindows/Resources/MenuPattern.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/xLibWpf;component/xWindows/Resources/ButtonPattern.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/xLibWpf;component/xWindows/Resources/TextBoxPattern.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/xLibWpf;component/xWindows/Resources/ListViewPattern.xaml"/>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Application.Resources>
