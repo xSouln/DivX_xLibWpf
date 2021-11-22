@@ -89,10 +89,55 @@ namespace xLib
             return false;
         }
         //===============================================================================================================================================================================
+        public static string GetRange(string str, int start_index, int count)
+        {
+            string result = "";
+            if (str == null) { return result; }
+
+            int i = start_index;
+            while (i < start_index + count && i < str.Length)
+            {
+                result += str[i];
+                i++;
+            }
+            return result;
+        }
+        //===============================================================================================================================================================================
+        public static string[] Split(string content, string separator)
+        {
+            if (content == null || separator == null) return null;
+            List<string> rows = new List<string>();
+            List<byte> data = new List<byte>();
+
+            foreach (byte ch in content)
+            {
+                data.Add(ch);
+
+                if (data.Count >= separator.Length)
+                {
+                    int i = separator.Length;
+                    int j = data.Count;
+                    while (i > 0)
+                    {
+                        i--;
+                        j--;
+
+                        if (separator[i] != data[j]) { goto end_foreach; }
+                    }
+
+                    data.RemoveRange(data.Count - separator.Length, separator.Length);
+                    rows.Add(Encoding.UTF8.GetString(data.ToArray()));
+                    data.Clear();
+                }
+            end_foreach:;
+            }
+            return rows.ToArray();
+        }
+        //===============================================================================================================================================================================
         public static string[] Split(string[] str1, string str2)
         {
             if (str1 == null || str2 == null) return null;
-            List<string> StrOut = new List<string>();
+            List<string> rows = new List<string>();
             string TempStr;
             for (int i = 0; i < str1.Length; i++)
             {
@@ -101,14 +146,14 @@ namespace xLib
                 {
                     for (int j = 0; j < str1[i].Length; j++)
                     {
-                        if (j <= str1[i].Length - str2.Length && Compare(str1[i], j, str2)) { if (TempStr.Length > 0) StrOut.Add(TempStr); j += str2.Length - 1; TempStr = ""; }
+                        if (j <= str1[i].Length - str2.Length && Compare(str1[i], j, str2)) { if (TempStr.Length > 0) rows.Add(TempStr); j += str2.Length - 1; TempStr = ""; }
                         else TempStr += str1[i][j];
                     }
-                    if (TempStr.Length > 0) StrOut.Add(TempStr);
+                    if (TempStr.Length > 0) rows.Add(TempStr);
                 }
-                else StrOut.Add(str1[i]);
+                else rows.Add(str1[i]);
             }
-            return StrOut.ToArray();
+            return rows.ToArray();
         }
         //===============================================================================================================================================================================
         public static List<byte[]> Split(byte[] str, char separator, char[] ignoring)
