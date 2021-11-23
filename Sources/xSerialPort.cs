@@ -24,7 +24,7 @@ namespace xLib
         public const string FILE_NAME_COMPORT_OPTIONS = "ComPortOption.xDat";
         public xAction<string> Tracer;
 
-        public event xEventChangeState<xSerialPort, bool> EventChangeConnectionState;
+        public event xEventChangeState<xSerialPort, bool> ConnectionStateChanged;
         public event xEventChangeState<xSerialPort, string> EventFindeLastConnectedPortName;
 
         //private Thread RxThread;
@@ -82,7 +82,7 @@ namespace xLib
                     is_connected = value;
                     OnPropertyChanged(nameof(IsConnected));
                     OnPropertyChanged(nameof(SelectIsEnable));
-                    EventChangeConnectionState?.Invoke(this, value);
+                    ConnectionStateChanged?.Invoke(this, value);
                 }
             }
         }
