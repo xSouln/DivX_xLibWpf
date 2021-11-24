@@ -117,7 +117,7 @@ namespace xLib
         {
             xSerialPort serial_port = (xSerialPort)arg;
 
-            if (serial_port.Port != null && serial_port.Port.IsOpen)
+            if (serial_port != null && serial_port.Port != null && serial_port.Port.IsOpen)
             {
                 while (serial_port.Port.BytesToRead > 0) { serial_port.Receiver.Add((byte)serial_port.Port.ReadByte()); }
                 return;
