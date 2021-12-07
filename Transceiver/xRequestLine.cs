@@ -126,7 +126,11 @@ namespace xLib.Transceiver
                             ", response time: " + res.ResponseTime + "ms"
                             );
                     }
-                    else { tracer?.Invoke("Transmition result: " + "null"); break; }
+                    else
+                    {
+                        tracer?.Invoke("Transmition result: " + "null");
+                        break;
+                    }
                 }
                 stop_watch.Stop();
                 result.ResponseTime = stop_watch.ElapsedMilliseconds;

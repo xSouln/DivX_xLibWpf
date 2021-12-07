@@ -105,7 +105,10 @@ namespace xLib
             {
                 if (boad_rate != value)
                 {
-                    if (Port != null) { Port.BaudRate = value; }
+                    if (Port != null)
+                    {
+                        Port.BaudRate = value;
+                    }
                     boad_rate = value;
                     trace("" + PortName + "(boad rate changed at " + boad_rate + ")");
                     OnPropertyChanged(nameof(BoadRate));

@@ -283,6 +283,19 @@ namespace xLib
 
             return str;
         }
+
+        public static string GetString(byte[] data)
+        {
+            string str = "";
+
+            foreach (byte ch in data)
+            {
+                str += (char)ch;
+            }
+
+            return str;
+        }
+
         public static unsafe string GetString(void* obj, int offset, int obj_size, char end)
         {
             string str = "";
