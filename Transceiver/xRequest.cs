@@ -46,22 +46,6 @@ namespace xLib.Transceiver
             //thread.Start();
         }
 
-        private void thread_handler()
-        {
-            while (true)
-            {
-                read_write_synchronize.WaitOne();
-                /*
-                for ()
-                {
-
-                }
-                */
-                read_write_synchronize.Set();
-                Thread.Sleep(1);
-            }
-        }
-
         protected virtual void requests_update()
         {
             int i = 0;
@@ -357,6 +341,20 @@ namespace xLib.Transceiver
             return result;
         }
 
+        public static TRequest Transmition<TRequest>(TRequest request, xAction<bool, byte[]> transmitter, int try_count, int response_time_out) where TRequest : xRequest
+        {
+            if (transmitter == null || try_count <= 0 || response_time_out <= 0 || request.transmission_state != ERequestState.Free) { return null; }
+
+            request.transmitter = transmitter;
+            request.try_count = try_count;
+            request.response_time_out = response_time_out;
+            request.try_number = 0;
+            request.response.Result = null;
+
+            var result = request.transmition();
+            return (TRequest)result;
+        }
+
         public virtual async Task<xRequest> TransmitionAsync(xAction<bool, byte[]> transmitter, int try_count, int response_time_out)
         {
             if (transmitter == null || try_count <= 0 || response_time_out <= 0 || transmission_state != ERequestState.Free) { return null; }
@@ -369,6 +367,36 @@ namespace xLib.Transceiver
             var result = await Task.Run(() => transmition());
             //var result = await Task.Run(() => transmition_async());
             return result;
+        }
+
+        public static async Task<TRequest> TransmitionAsync<TRequest>(TRequest request, xAction<bool, byte[]> transmitter, int try_count, int response_time, CancellationTokenSource cancellation) where TRequest : xRequest
+        {
+            if (transmitter == null || try_count <= 0 || response_time <= 0 || request.transmission_state != ERequestState.Free) { return null; }
+
+            if (cancellation == null) { cancellation = new CancellationTokenSource(); }
+
+            request.transmitter = transmitter;
+            request.try_count = try_count;
+            request.response_time_out = response_time;
+            request.try_number = 0;
+            request.response.Result = null;
+
+            var result = await Task.Run(() => request.transmition(), cancellation.Token);
+            return (TRequest)result;
+        }
+
+        public static async Task<TRequest> TransmitionAsync<TRequest>(TRequest request, xAction<bool, byte[]> transmitter, int try_count, int response_time) where TRequest : xRequest
+        {
+            if (transmitter == null || try_count <= 0 || response_time <= 0 || request.transmission_state != ERequestState.Free) { return null; }
+
+            request.transmitter = transmitter;
+            request.try_count = try_count;
+            request.response_time_out = response_time;
+            request.try_number = 0;
+            request.response.Result = null;
+
+            var result = await Task.Run(() => request.transmition());
+            return (TRequest)result;
         }
     }
 
