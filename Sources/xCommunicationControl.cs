@@ -46,10 +46,11 @@ namespace xLib.Sources
         public void StartControl(int update_period)
         {
             if (update_period < 100) { update_period = 100; }
+            timer?.Dispose();
             timer = new Timer(update_state, null, 0, update_period);
         }
 
-        public xCommunicationControl() { StartControl(2000); }
+        public xCommunicationControl() { } // StartControl(2000);
         public xCommunicationControl(int update_period) { StartControl(update_period); }
 
         public void Dispose() { timer?.Dispose(); }

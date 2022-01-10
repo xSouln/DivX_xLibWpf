@@ -55,7 +55,7 @@
             </Trigger>
 
             <Trigger Property="IsHighlighted" Value="True">
-                <Setter Property="Background" TargetName="templateRoot" Value="{StaticResource DarkBrush}"/>
+                <Setter Property="Background" TargetName="templateRoot" Value="{StaticResource MenuItemDarkBrush}"/>
                 <Setter Property="BorderBrush" TargetName="templateRoot" Value="#2C2C2C"/>
                 <Setter Property="BorderThickness" TargetName="templateRoot" Value="1"></Setter>
             </Trigger>

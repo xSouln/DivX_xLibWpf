@@ -25,10 +25,16 @@ namespace xLib
         private Thread client_thread;
 
         private string last_address;
+        private bool is_connected = false;
+        private int transmit_deadtime = 1;
+
         public string Ip;
         public int Port;
-        public bool is_connected = false;
         public int UpdatePeriod = 1;
+
+        private List<byte[]> transmit_line = new List<byte[]>();
+        private AutoResetEvent transmit_line_synchronizer = new AutoResetEvent(true);
+        private Thread transmit_line_thread;
 
         public xReceiver Receiver;
         private void trace(string note) { Tracer?.Invoke(note); xTracer.Message(note); }
@@ -42,6 +48,12 @@ namespace xLib
         {
             set { background_state = value; OnPropertyChanged(nameof(BackgroundState)); }
             get { return background_state; }
+        }
+
+        public int TransmitDeadtime
+        {
+            set { if (value < 1) { return; } transmit_deadtime = value; }
+            get => transmit_deadtime;
         }
 
         public string LastAddress
@@ -103,8 +115,19 @@ namespace xLib
         {
             if (stream != null) { stream.Flush(); stream.Close(); stream = null; }
             if (client != null) { client.Client?.Close(); client.Close(); client = null; }
-            try { client_thread?.Abort(); }
-            finally { trace("tcp client: thread close"); client_thread = null; IsConnected = false; }
+            try
+            {
+                client_thread?.Abort();
+                transmit_line_thread?.Abort();
+            }
+            finally
+            {
+                trace("tcp client: thread close");
+                transmit_line.Clear();
+                client_thread = null;
+                transmit_line_thread = null;
+                IsConnected = false;
+            }
         }
 
         private void request_callback(IAsyncResult ar)
@@ -112,8 +135,18 @@ namespace xLib
             try
             {
                 client = (TcpClient)ar.AsyncState;
-                if (client != null) { trace("tcp: client connected"); client_thread = new Thread(new ThreadStart(rx_thread)); client_thread.Start(); }
-                else trace("tcp client: client connect error");
+                if (client != null)
+                {
+                    trace("tcp: client connected");
+                    /*
+                    transmit_line.Clear();
+                    transmit_line_thread = new Thread(transmit_line_thread_handler);
+                    transmit_line_thread.Start();
+                    */
+                    client_thread = new Thread(new ThreadStart(rx_thread));
+                    client_thread.Start();
+                }
+                else { trace("tcp client: client connect error"); }
             }
             catch (Exception ex)
             {
@@ -172,7 +205,7 @@ namespace xLib
             //trace("tcp: нет соединения");
             return false;
         }
-        //=====================================================================================================================
+
         public bool Send(byte[] data)
         {
             if (client != null && stream != null && client.Connected && data != null && data.Length > 0)
@@ -184,6 +217,39 @@ namespace xLib
             return false;
         }
         //=====================================================================================================================
+        private void transmit_line_thread_handler()
+        {
+            while (true)
+            {
+                if (transmit_line.Count > 0)
+                {
+                    Send(transmit_line[0]);
+
+                    transmit_line_synchronizer.WaitOne();
+                    transmit_line.RemoveAt(0);
+                    transmit_line_synchronizer.Set();
+                }
+                Thread.Sleep(transmit_deadtime);
+            }
+        }
+
+        public bool InLineAdd(byte[] data)
+        {
+            if (client != null && stream != null && client.Connected && data != null && data.Length > 0)
+            {
+                try
+                {
+                    transmit_line_synchronizer.WaitOne();
+                    transmit_line.Add(data);
+                    return true;
+                }
+                finally
+                {
+                    transmit_line_synchronizer.Set();
+                }
+            }
+            return false;
+        }
         //=====================================================================================================================
     }
 }

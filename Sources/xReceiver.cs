@@ -35,7 +35,10 @@ namespace xLib
             Buf.Data = new byte[BufSize];
             Buf.ByteRecived = 0;
 
-            if (this.EndLine == null) { this.EndLine = new byte[] { (byte)'\r' }; }
+            if (this.EndLine == null)
+            {
+                this.EndLine = new byte[] { (byte)'\r' };
+            }
         }
         private unsafe void BufLoaded()
         {
@@ -44,7 +47,11 @@ namespace xLib
                 xReceiverData data = new xReceiverData();
                 data.xRx = this;
                 data.Content.Size = Buf.ByteRecived;
-                fixed (byte* ptr = Buf.Data) { data.Content.Obj = ptr; EventPacketReceive(data); }
+                fixed (byte* ptr = Buf.Data)
+                {
+                    data.Content.Obj = ptr;
+                    EventPacketReceive(data);
+                }
             }
             Buf.ByteRecived = 0;
         }
@@ -57,10 +64,17 @@ namespace xLib
                 xReceiverData data = new xReceiverData();
                 data.xRx = this;
                 data.Content.Size = Buf.ByteRecived - EndLine.Length;
-                fixed (byte* ptr = Buf.Data) { data.Content.Obj = ptr; EventPacketReceive(data); }
+                fixed (byte* ptr = Buf.Data)
+                {
+                    data.Content.Obj = ptr;
+                    EventPacketReceive(data);
+                }
             }
 
-            if (Response == xRxResponse.Accept) { Buf.ByteRecived = 0; }
+            if (Response == xRxResponse.Accept)
+            {
+                Buf.ByteRecived = 0;
+            }
         }
 
         public void Add(byte data)
@@ -68,20 +82,27 @@ namespace xLib
             Buf.Data[Buf.ByteRecived] = data;
             Buf.ByteRecived++;
 
-            if (Buf.ByteRecived > EndLine.Length) {
+            if (Buf.ByteRecived > EndLine.Length)
+            {
                 int i = EndLine.Length;
                 int j = Buf.ByteRecived;
                 while (i > 0)
                 {
                     i--;
                     j--;
-                    if (EndLine[i] != Buf.Data[j]) { goto verify_end; }
+                    if (EndLine[i] != Buf.Data[j])
+                    {
+                        goto verify_end;
+                    }
                 }
                 EndLineIdentify();
             }
 
         verify_end:
-            if (Buf.ByteRecived == Buf.Data.Length) { BufLoaded(); }
+            if (Buf.ByteRecived >= Buf.Data.Length)
+            {
+                BufLoaded();
+            }
         }
 
         public void Clear()

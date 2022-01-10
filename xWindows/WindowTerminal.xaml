@@ -16,38 +16,6 @@
             <RowDefinition Height="50*" MinHeight="50" MaxHeight="50"/>
         </Grid.RowDefinitions>
         <TabControl x:Name="TabControl" Margin="5,5,10,5" Background="#FF3F3F46" BorderBrush="#FFB26A22">
-            <TabItem Header="Log" Width="90" FontSize="18">
-                <Grid>
-                    <ListView x:Name="ListViewLog" FontSize="18" Background="#FF3F3F46" Foreground="#FFDEC316" BorderBrush="{x:Null}">
-                        <ListView.Resources>
-                            <Style TargetType="{x:Type ListViewItem}">
-                                <Style.Triggers>
-                                    <Trigger Property="IsFocused" Value="True">
-                                        <Setter Property="Background" Value="DarkBlue"/>
-                                    </Trigger>
-
-                                    <Trigger Property="IsSelected" Value="True">
-                                        <Setter Property="Background" Value="DarkBlue"/>
-                                    </Trigger>
-
-                                    <Trigger Property="IsMouseOver" Value="True">
-                                        <Setter Property="Background" Value="DarkBlue"/>
-                                    </Trigger>
-
-                                </Style.Triggers>
-                            </Style>
-                        </ListView.Resources>
-                        <ListView.View>
-                            <GridView>
-                                <GridViewColumn Header="Time" DisplayMemberBinding="{Binding Time}" Width="180"/>
-                                <GridViewColumn Header="Type" DisplayMemberBinding="{Binding Note}" Width="100"/>
-                                <GridViewColumn Header="Note" DisplayMemberBinding="{Binding Data}" Width="600"/>
-                                <GridViewColumn Header="Data" DisplayMemberBinding="{Binding ConvertData}" Width="500"/>
-                            </GridView>
-                        </ListView.View>
-                    </ListView>
-                </Grid>
-            </TabItem>
             <TabItem Header="Info" Width="90" FontSize="18">
                 <Grid>
                     <ListView x:Name="ListViewInfo" FontSize="18" Background="#FF3F3F46" Foreground="#FFDEC316" BorderBrush="{x:Null}">
@@ -74,7 +42,37 @@
                                 <GridViewColumn Header="Time" DisplayMemberBinding="{Binding Time}" Width="180"/>
                                 <GridViewColumn Header="Type" DisplayMemberBinding="{Binding Note}" Width="100"/>
                                 <GridViewColumn Header="Note" DisplayMemberBinding="{Binding Data}" Width="600"/>
-                                <GridViewColumn Header="Data" DisplayMemberBinding="{Binding ConvertData}" Width="700"/>
+                            </GridView>
+                        </ListView.View>
+                    </ListView>
+                </Grid>
+            </TabItem>
+            <TabItem Header="Log" Width="90" FontSize="18">
+                <Grid>
+                    <ListView x:Name="ListViewLog" FontSize="18" Background="#FF3F3F46" Foreground="#FFDEC316" BorderBrush="{x:Null}">
+                        <ListView.Resources>
+                            <Style TargetType="{x:Type ListViewItem}">
+                                <Style.Triggers>
+                                    <Trigger Property="IsFocused" Value="True">
+                                        <Setter Property="Background" Value="DarkBlue"/>
+                                    </Trigger>
+
+                                    <Trigger Property="IsSelected" Value="True">
+                                        <Setter Property="Background" Value="DarkBlue"/>
+                                    </Trigger>
+
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter Property="Background" Value="DarkBlue"/>
+                                    </Trigger>
+
+                                </Style.Triggers>
+                            </Style>
+                        </ListView.Resources>
+                        <ListView.View>
+                            <GridView>
+                                <GridViewColumn Header="Time" DisplayMemberBinding="{Binding Time}" Width="180"/>
+                                <GridViewColumn Header="Type" DisplayMemberBinding="{Binding Note}" Width="100"/>
+                                <GridViewColumn Header="Note" DisplayMemberBinding="{Binding Data}" Width="600"/>
                             </GridView>
                         </ListView.View>
                     </ListView>
@@ -106,7 +104,6 @@
                                 <GridViewColumn Header="Time" DisplayMemberBinding="{Binding Time}" Width="200"/>
                                 <GridViewColumn Header="Type" DisplayMemberBinding="{Binding Note}" Width="150"/>
                                 <GridViewColumn Header="Note" DisplayMemberBinding="{Binding Data}" Width="400"/>
-                                <GridViewColumn Header="Data" DisplayMemberBinding="{Binding ConvertData}" Width="500"/>
                             </GridView>
                         </ListView.View>
                     </ListView>

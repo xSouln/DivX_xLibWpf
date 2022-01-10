@@ -24,10 +24,10 @@ namespace xLib
         public const string FILE_NAME_COMPORT_OPTIONS = "ComPortOption.xDat";
         public xAction<string> Tracer;
 
-        public event xEventChangeState<xSerialPort, bool> EventChangeConnectionState;
+        public event xEventChangeState<xSerialPort, bool> ConnectionStateChanged;
         public event xEventChangeState<xSerialPort, string> EventFindeLastConnectedPortName;
 
-        //private Thread RxThread;
+        private Thread RxThread;
         private Timer timer_finde_ports;
         private Timer timer_update_rx;
 
@@ -82,7 +82,7 @@ namespace xLib
                     is_connected = value;
                     OnPropertyChanged(nameof(IsConnected));
                     OnPropertyChanged(nameof(SelectIsEnable));
-                    EventChangeConnectionState?.Invoke(this, value);
+                    ConnectionStateChanged?.Invoke(this, value);
                 }
             }
         }
@@ -105,7 +105,10 @@ namespace xLib
             {
                 if (boad_rate != value)
                 {
-                    if (Port != null) { Port.BaudRate = value; }
+                    if (Port != null)
+                    {
+                        Port.BaudRate = value;
+                    }
                     boad_rate = value;
                     trace("" + PortName + "(boad rate changed at " + boad_rate + ")");
                     OnPropertyChanged(nameof(BoadRate));
@@ -113,17 +116,19 @@ namespace xLib
             }
         }
 
-        private static void read_data(object arg)
+        private void read_data()
         {
-            xSerialPort serial_port = (xSerialPort)arg;
-
-            if (serial_port.Port != null && serial_port.Port.IsOpen)
+            while (Port != null && Port.IsOpen)
             {
-                while (serial_port.Port.BytesToRead > 0) { serial_port.Receiver.Add((byte)serial_port.Port.ReadByte()); }
-                return;
+                while (Port.BytesToRead > 0)
+                {
+                    Receiver.Add((byte)Port.ReadByte());
+                }
+                Thread.Sleep(1);
             }
-            serial_port.trace(serial_port.PortName + "(boadrate: " + serial_port.BoadRate + "): error read data");
-            serial_port.Disconnect();
+
+            trace(PortName + "(boadrate: " + BoadRate + "): error read data");
+            Disconnect();
         }
 
         public bool Connect(string name)
@@ -133,7 +138,7 @@ namespace xLib
 
             try
             {
-                if (Receiver == null) { Receiver = new xReceiver(10000, new byte[] { (byte)'\r', (byte)'\n' }); }
+                if (Receiver == null) { Receiver = new xReceiver(50000, new byte[] { (byte)'\r', (byte)'\n' }); }
                 Port = new SerialPort(name, BoadRate, Parity.None, 8, StopBits.One);
                 Port.Encoding = Encoding.GetEncoding("iso-8859-1");
                 Port.ReadBufferSize = 100000;
@@ -145,12 +150,14 @@ namespace xLib
                 trace(name + "(boadrate: " + BoadRate + "): rx thred started");
 
                 IsConnected = true;
-                timer_update_rx = new Timer(read_data, this, 1000, 10);
+                //timer_update_rx = new Timer(read_data, this, 1000, 10);
+                RxThread = new Thread(read_data);
+                RxThread.Start();
                 trace(name + "(boadrate: " + BoadRate + "): connected");
             }
             catch (Exception ex)
             {
-                trace(name + "(boadrate: " + BoadRate + "): error connect");
+                trace(name + "(boadrate: " + BoadRate + "): error connect " + ex);
                 Disconnect();
             }
 
@@ -160,8 +167,13 @@ namespace xLib
         public void Disconnect()
         {
             timer_update_rx?.Dispose();
+
+            RxThread?.Abort();
+            RxThread = null;
+
             Port?.Close();
             Port = null;
+
             IsConnected = false;
             trace(PortName + "(boadrate: " + BoadRate + "): disconnected");
         }

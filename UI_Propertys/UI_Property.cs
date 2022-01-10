@@ -137,6 +137,22 @@ namespace xLib.UI_Propertys
             set { visibility_request = value; OnPropertyChanged(nameof(VisibilityRequest)); }
         }
 
+        public virtual bool SetValue(object request)
+        {
+            try
+            {
+                if (Comparer<object>.Default.Compare(_value, request) != 0)
+                {
+                    _value = request;
+                    OnPropertyChanged(nameof(Value));
+                    EventValueChanged?.Invoke(this);
+                    BackgroundValue = BackgroundValueRule?.Invoke(this);
+                }
+            }
+            catch { return false; }
+            return true;
+        }
+
         public virtual object Value
         {
             get { return _value; }
@@ -253,7 +269,23 @@ namespace xLib.UI_Propertys
             }
             get { return (TValue)_request; }
         }
-
+        /*
+        public override bool SetValue(object request)
+        {
+            try
+            {
+                if (Comparer<object>.Default.Compare(_value, request) != 0)
+                {
+                    _value = request;
+                    OnPropertyChanged(nameof(Value));
+                    EventValueChanged?.Invoke(this);
+                    BackgroundValue = BackgroundValueRule?.Invoke(this);
+                }
+            }
+            catch { return false; }
+            return true;
+        }
+        */
         public override void Update()
         {
             BackgroundRequest = BackgroundRequestRule?.Invoke(this);
