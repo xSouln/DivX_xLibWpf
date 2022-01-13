@@ -11,9 +11,11 @@ namespace xLib
     public delegate void ActionAccessUI(xAction request, object arg);
     public delegate void ActionAccessUI<TRequest>(xAction action, TRequest arg);
 
-    public delegate TResult xAction<out TResult, TRequest>(TRequest request);
+    public delegate TResult xAction<TResult, TRequest>(TRequest request);
     public delegate void xAction<TRequest>(TRequest request);
     public delegate void xAction(object request);
+
+    public delegate void UIAction<TContext, TRequest>(TContext context, TRequest request);
 
     public delegate TResult xEvent<out TResult, TArgument>(TArgument arg);
     public delegate void xEvent<TArgument>(TArgument arg);

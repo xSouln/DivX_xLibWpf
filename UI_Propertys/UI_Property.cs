@@ -21,9 +21,15 @@ namespace xLib.UI_Propertys
     {
         TValue Value { get; set; }
     }
+
     public interface IUI_PropertyRequest<TRequest>
     {
         TRequest Request { get; set; }
+    }
+
+    public interface IUI_Code
+    {
+        int Code { get; set; }
     }
 
     public abstract class NotifyPropertyChanged : INotifyPropertyChanged
@@ -46,10 +52,10 @@ namespace xLib.UI_Propertys
         protected bool state = false;
         protected bool is_writable = false;
         protected bool is_enable = true;
-        protected int code;
+        protected object code;
 
         protected object _value;
-        protected object _request;
+        public object _request;
 
         protected Visibility visibility_value = Visibility.Visible;
         protected Visibility visibility_request = Visibility.Visible;
@@ -88,13 +94,13 @@ namespace xLib.UI_Propertys
             set { note = value; OnPropertyChanged(nameof(Note)); }
             get { return note; }
         }
-
-        public virtual int Code
+        
+        public virtual object Code
         {
             set { code = value; OnPropertyChanged(nameof(Code)); }
             get { return code; }
         }
-
+        
         public bool IsEnable
         {
             set { is_enable = value; OnPropertyChanged(nameof(IsEnable)); }
@@ -110,7 +116,7 @@ namespace xLib.UI_Propertys
         public bool IsWritable
         {
             set { is_writable = value; IsEnable = is_enable | is_writable; OnPropertyChanged(nameof(IsWritable)); OnPropertyChanged(nameof(IsReadOnly)); }
-            get { return is_writable; }
+            get => is_writable;
         }
 
         public Brush BackgroundValue
@@ -141,23 +147,43 @@ namespace xLib.UI_Propertys
         {
             try
             {
-                if (Comparer<object>.Default.Compare(_value, request) != 0)
-                {
-                    _value = request;
-                    OnPropertyChanged(nameof(Value));
-                    EventValueChanged?.Invoke(this);
-                    BackgroundValue = BackgroundValueRule?.Invoke(this);
-                }
+                Value = request;
             }
-            catch { return false; }
+            catch
+            {
+                return false;
+            }
+            return true;
+        }
+
+        public virtual bool SetRequest<TArg>(TArg request) where TArg : IConvertible
+        {
+            try
+            {
+                Request = request;
+            }
+            catch
+            {
+                return false;
+            }
             return true;
         }
 
         public virtual object Value
         {
-            get { return _value; }
+            get => _value;
             set
             {
+                if (_value != null)
+                {
+                    try
+                    {
+                        var result = Convert.ChangeType(value, _value?.GetType());
+                        if (result != null) { value = result; }
+                    }
+                    catch { }
+                }
+
                 if (Comparer<object>.Default.Compare(_value, value) != 0)
                 {
                     _value = value;
@@ -170,9 +196,19 @@ namespace xLib.UI_Propertys
 
         public virtual object Request
         {
-            get { return _request; }
+            get => _request;
             set
             {
+                if (_request != null)
+                {
+                    try
+                    {
+                        var result = Convert.ChangeType(value, _request?.GetType());
+                        if (result != null) { value = result; }
+                    }
+                    catch { }
+                }
+
                 if (Comparer<object>.Default.Compare(_request, value) != 0)
                 {
                     _request = value;
@@ -202,7 +238,7 @@ namespace xLib.UI_Propertys
             return property.Value;
         }
 
-        protected object wait_value_state(UI_Property property, object state, int time)
+        protected TState wait_value_state<TState>(UI_Property property, TState state, int time)
         {
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
@@ -211,105 +247,39 @@ namespace xLib.UI_Propertys
                 Thread.Sleep(1);
             }
             stopwatch.Stop();
-            return property.Value;
+            return (TState)property.Value;
         }
 
-        public virtual object WaitValue(object state, int time)
+        public virtual TState WaitValue<TState>(TState state, int time)
         {
             return wait_value_state(this, state, time);
         }
 
-        public virtual async Task<object> WaitValueAsync(object state, int time)
+        public virtual async Task<TState> WaitValueAsync<TState>(TState state, int time)
         {
-            return await Task.Run(() => wait_value_state_async(this, state, time));
+            return (TState)await Task.Run(() => wait_value_state_async(this, state, time));
         }
 
         public virtual void Select()
         {
             EventSelection?.Invoke(this);
         }
+
+        public virtual TValue Offset<TValue>(TValue value, int offset)
+        {
+            dynamic a = value;
+            a += offset;
+            return (TValue)a;
+        }
     }
 
-    public class UI_Property<TValue> : UI_Property, IUI_PropertyEvents
+    public class UI_Property<TValue, TRequest> : UI_Property, IUI_PropertyEvents where TValue : IComparable where TRequest : IComparable
     {
-        public UI_Property() { _value = default(TValue); _request = default(TValue); }
-
-        public new xEvent<UI_Property<TValue>> EventValueChanged;
-        public new xEvent<UI_Property<TValue>> EventRequestChanged;
-        public new xEvent<UI_Property<TValue>> EventSelection;
-        public new xBackgroundRule<UI_Property<TValue>> BackgroundValueRule;
-        public new xBackgroundRule<UI_Property<TValue>> BackgroundRequestRule;
-
-        public new TValue Value
+        public UI_Property()
         {
-            set
-            {
-                if (Comparer<TValue>.Default.Compare((TValue)_value, value) != 0)
-                {
-                    _value = value;
-                    OnPropertyChanged(nameof(Value));
-                    EventValueChanged?.Invoke(this);
-                    BackgroundValue = BackgroundValueRule?.Invoke(this);
-                }
-            }
-            get { return (TValue)_value; }
+            _value = default(TValue);
+            _request = default(TRequest);
         }
-
-        public new TValue Request
-        {
-            set
-            {
-                if (Comparer<TValue>.Default.Compare((TValue)_request, value) != 0)
-                {
-                    _request = value;
-                    OnPropertyChanged(nameof(Request));
-                    EventRequestChanged?.Invoke(this);
-                    BackgroundRequest = BackgroundRequestRule?.Invoke(this);
-                }
-            }
-            get { return (TValue)_request; }
-        }
-        /*
-        public override bool SetValue(object request)
-        {
-            try
-            {
-                if (Comparer<object>.Default.Compare(_value, request) != 0)
-                {
-                    _value = request;
-                    OnPropertyChanged(nameof(Value));
-                    EventValueChanged?.Invoke(this);
-                    BackgroundValue = BackgroundValueRule?.Invoke(this);
-                }
-            }
-            catch { return false; }
-            return true;
-        }
-        */
-        public override void Update()
-        {
-            BackgroundRequest = BackgroundRequestRule?.Invoke(this);
-            BackgroundValue = BackgroundValueRule?.Invoke(this);
-        }
-
-        //public async Task<TValue> WaitValue(TValue state, int time) { return (TValue)await Task.Run(() => wait_value_state_async(this, state, time)); }
-
-        public virtual TValue WaitValue(TValue state, int time)
-        {
-            return (TValue)wait_value_state(this, state, time);
-        }
-
-        public virtual async Task<TValue> WaitValueAsync(TValue state, int time)
-        {
-            return (TValue)await Task.Run(() => wait_value_state_async(this, state, time));
-        }
-
-        public override void Select() => EventSelection?.Invoke(this);
-    }
-
-    public class UI_Property<TValue, TRequest> : UI_Property, IUI_PropertyEvents where TValue : IComparable
-    {
-        public UI_Property() { _value = default(TValue); _request = default(TRequest); }
 
         public new xEvent<UI_Property<TValue, TRequest>> EventValueChanged;
         public new xEvent<UI_Property<TValue, TRequest>> EventRequestChanged;
@@ -320,9 +290,9 @@ namespace xLib.UI_Propertys
 
         public new TValue Value
         {
+            get => (TValue)_value;
             set
             {
-                if (ValueParseRule != null) { value = ValueParseRule((TValue)_value, value); }
                 if (Comparer<TValue>.Default.Compare((TValue)_value, value) != 0)
                 {
                     _value = value;
@@ -331,11 +301,11 @@ namespace xLib.UI_Propertys
                     BackgroundValue = BackgroundValueRule?.Invoke(this);
                 }
             }
-            get { return (TValue)_value; }
         }
 
         public new TRequest Request
         {
+            get => (TRequest)_request;
             set
             {
                 if (Comparer<TRequest>.Default.Compare((TRequest)_request, value) != 0)
@@ -346,7 +316,6 @@ namespace xLib.UI_Propertys
                     BackgroundRequest = BackgroundRequestRule?.Invoke(this);
                 }
             }
-            get { return (TRequest)_request; }
         }
 
         public override void Update()
@@ -354,8 +323,6 @@ namespace xLib.UI_Propertys
             BackgroundRequest = BackgroundRequestRule?.Invoke(this);
             BackgroundValue = BackgroundValueRule?.Invoke(this);
         }
-
-        //public async Task<TValue> WaitValue(TValue state, int time) => (TValue)await Task.Run(() => wait_value_state_async(this, state, time));
 
         public virtual TValue WaitValue(TValue state, int time)
         {
@@ -368,5 +335,10 @@ namespace xLib.UI_Propertys
         }
 
         public override void Select() => EventSelection?.Invoke(this);
+    }
+
+    public class UI_Property<TValue> : UI_Property<TValue, TValue>, IUI_PropertyEvents where TValue : IComparable
+    {
+        //public UI_Property() : base();
     }
 }
