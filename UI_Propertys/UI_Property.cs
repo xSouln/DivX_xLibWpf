@@ -75,7 +75,7 @@ namespace xLib.UI_Propertys
         public xBackgroundRule<UI_Property> BackgroundValueRule;
         public xBackgroundRule<UI_Property> BackgroundRequestRule;
 
-        public DataTemplate RequestDataTemplate;
+        public DataTemplate RequestTemplate;
         public Control RequestControl;
 
         public static Brush GetBrush(string request)
