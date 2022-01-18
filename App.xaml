@@ -10,6 +10,7 @@
                 <ResourceDictionary Source="pack://application:,,,/xLibWpf;component/xWindows/Resources/ButtonPattern.xaml"/>
                 <ResourceDictionary Source="pack://application:,,,/xLibWpf;component/xWindows/Resources/TextBoxPattern.xaml"/>
                 <ResourceDictionary Source="pack://application:,,,/xLibWpf;component/xWindows/Resources/ListViewPattern.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/xLibWpf;component/xWindows/Resources/TabItemPattern.xaml"/>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Application.Resources>
