@@ -29,7 +29,7 @@ namespace xLib
 
         private Thread RxThread;
         private Timer timer_finde_ports;
-        private Timer timer_update_rx;
+        //private Timer timer_update_rx;
 
         public SerialPort Port;
         public ObservableCollection<string> PortList { get; set; } = new ObservableCollection<string>();
@@ -166,7 +166,7 @@ namespace xLib
 
         public void Disconnect()
         {
-            timer_update_rx?.Dispose();
+            //timer_update_rx?.Dispose();
 
             RxThread?.Abort();
             RxThread = null;

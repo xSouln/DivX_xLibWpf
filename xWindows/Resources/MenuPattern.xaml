@@ -21,6 +21,17 @@
         </GradientBrush.GradientStops>
     </LinearGradientBrush>
 
+    <LinearGradientBrush x:Key="MenuItemBackground" StartPoint="0,0" EndPoint="0,1">
+        <GradientBrush.GradientStops>
+            <GradientStopCollection>
+                <GradientStop Color="#FF494951" Offset="0.0"/>
+                <GradientStop Color="#FF3F3F46" Offset="0.1"/>
+                <GradientStop Color="#FF494951" Offset="0.9"/>
+                <GradientStop Color="#FF3F3F46" Offset="1.0"/>
+            </GradientStopCollection>
+        </GradientBrush.GradientStops>
+    </LinearGradientBrush>
+
     <ControlTemplate TargetType="{x:Type MenuItem}" x:Key="MenuItemControlTemplate1">
         <Border x:Name="templateRoot" 
             BorderBrush="#FF834545" 

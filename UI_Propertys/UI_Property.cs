@@ -60,7 +60,9 @@ namespace xLib.UI_Propertys
         protected Visibility visibility_value = Visibility.Visible;
         protected Visibility visibility_request = Visibility.Visible;
 
-        public static Brush RED = (Brush)new BrushConverter().ConvertFrom("#FF641818");
+        //public static Brush RED = (Brush)new BrushConverter().ConvertFrom("#FF641818");
+        public static Brush RED;
+
         public static Brush GREEN = (Brush)new BrushConverter().ConvertFrom("#FF21662A");
         public static Brush YELLOW = (Brush)new BrushConverter().ConvertFrom("#FF724C21");
         public static Brush TRANSPARENT = null;
@@ -75,8 +77,68 @@ namespace xLib.UI_Propertys
         public xBackgroundRule<UI_Property> BackgroundValueRule;
         public xBackgroundRule<UI_Property> BackgroundRequestRule;
 
-        public DataTemplate RequestTemplate;
+        public xAction<DataTemplate, object> TemplateSetter;
+
+        public DataTemplate request_template;
         public Control RequestControl;
+
+        public object RequestTemplate
+        {
+            get => request_template;
+            set
+            {
+                request_template = (DataTemplate)value;
+                OnPropertyChanged(nameof(RequestTemplate));
+            }
+        }
+
+        public static DataTemplate SelectTemplate(object item, DependencyObject container, object owner)
+        {
+            UI_Property property = item as UI_Property;
+            if (property != null && property.TemplateSetter != null)
+            {
+                return property.TemplateSetter(owner);
+            }
+
+            if (property != null && property.request_template != null)
+            {
+                return property.request_template;
+            }
+
+            return new DataTemplate
+            {
+                VisualTree = new FrameworkElementFactory(typeof(ContentControl)),
+                DataType = typeof(GridViewColumn)
+            };
+        }
+
+        public object TemplateSelector
+        {
+            get => null;
+            set
+            {
+                var a = value;
+                OnPropertyChanged(nameof(TemplateSelector));
+            }
+        }
+
+        static UI_Property()
+        {
+            LinearGradientBrush myLinearGradientBrush = new LinearGradientBrush();
+            myLinearGradientBrush.StartPoint = new Point(0, 0);
+            myLinearGradientBrush.EndPoint = new Point(1, 1);
+
+            var color = System.Drawing.Color.FromName("#FF641818");
+            myLinearGradientBrush.GradientStops.Add(new GradientStop(Color.FromArgb(color.A, color.R, color.G, color.B), 0.0));
+
+            color = System.Drawing.Color.FromName("#FF641818");
+            myLinearGradientBrush.GradientStops.Add(new GradientStop(Color.FromArgb(color.A, color.R, color.G, color.B), 0.5));
+
+            color = System.Drawing.Color.FromName("#FF641818");
+            myLinearGradientBrush.GradientStops.Add(new GradientStop(Color.FromArgb(color.A, color.R, color.G, color.B), 1.0));
+
+            RED = (Brush)new BrushConverter().ConvertFrom("#FF641818");
+        }
 
         public static Brush GetBrush(string request)
         {
