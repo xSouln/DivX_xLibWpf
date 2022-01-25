@@ -98,8 +98,8 @@ namespace xLib.Sources
         //=====================================================================================================================
         public class UIPropertys
         {
-            public UI_Property<string, string> Ip = new UI_Property<string, string>() { Name = nameof(Ip), IsWritable = true };
-            public UI_Property<int, int> Port = new UI_Property<int, int>() { Name = nameof(Port), IsWritable = true };
+            public UI_Property<string, string> Ip = new UI_Property<string, string>() { Name = nameof(Ip) };
+            public UI_Property<int, int> Port = new UI_Property<int, int>() { Name = nameof(Port) };
             public UI_Property<int, int> Connections = new UI_Property<int, int>() { Name = nameof(Connections) };
             public UI_Property<int, int> QueueSize = new UI_Property<int, int>() { Name = nameof(QueueSize) };
             public UI_Property<bool, bool> IsStarted = new UI_Property<bool, bool>() { Name = nameof(IsStarted) };

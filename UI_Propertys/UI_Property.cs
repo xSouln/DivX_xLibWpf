@@ -55,14 +55,9 @@ namespace xLib.UI_Propertys
         protected object code;
 
         protected object _value;
-        public object _request;
+        protected object _request;
 
-        protected Visibility visibility_value = Visibility.Visible;
-        protected Visibility visibility_request = Visibility.Visible;
-
-        //public static Brush RED = (Brush)new BrushConverter().ConvertFrom("#FF641818");
-        public static Brush RED;
-
+        public static Brush RED = (Brush)new BrushConverter().ConvertFrom("#FF641818");
         public static Brush GREEN = (Brush)new BrushConverter().ConvertFrom("#FF21662A");
         public static Brush YELLOW = (Brush)new BrushConverter().ConvertFrom("#FF724C21");
         public static Brush TRANSPARENT = null;
@@ -79,7 +74,7 @@ namespace xLib.UI_Propertys
 
         public xAction<DataTemplate, object> TemplateSetter;
 
-        public DataTemplate request_template;
+        protected DataTemplate request_template;
         public Control RequestControl;
 
         public object RequestTemplate
@@ -172,18 +167,6 @@ namespace xLib.UI_Propertys
             get { return is_enable; }
         }
 
-        public bool IsReadOnly
-        {
-            get { return !is_writable; }
-            set { }
-        }
-
-        public bool IsWritable
-        {
-            set { is_writable = value; IsEnable = is_enable | is_writable; OnPropertyChanged(nameof(IsWritable)); OnPropertyChanged(nameof(IsReadOnly)); }
-            get => is_writable;
-        }
-
         public Brush BackgroundValue
         {
             set { background_value = value; OnPropertyChanged(nameof(BackgroundValue)); }
@@ -194,18 +177,6 @@ namespace xLib.UI_Propertys
         {
             set { background_request = value; OnPropertyChanged(nameof(BackgroundRequest)); }
             get { return background_request; }
-        }
-
-        public Visibility VisibilityValue
-        {
-            get { return visibility_value; }
-            set { visibility_value = value; OnPropertyChanged(nameof(VisibilityValue)); }
-        }
-
-        public Visibility VisibilityRequest
-        {
-            get => _request == null ? Visibility.Collapsed : visibility_request;
-            set { visibility_request = value; OnPropertyChanged(nameof(VisibilityRequest)); }
         }
 
         public virtual bool SetValue(object request)
@@ -387,6 +358,8 @@ namespace xLib.UI_Propertys
         {
             BackgroundRequest = BackgroundRequestRule?.Invoke(this);
             BackgroundValue = BackgroundValueRule?.Invoke(this);
+            OnPropertyChanged(nameof(Request));
+            OnPropertyChanged(nameof(Value));
         }
 
         public virtual TValue WaitValue(TValue state, int time)

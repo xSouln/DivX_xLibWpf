@@ -4,6 +4,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using xLib.Transceiver;
 
 namespace xLib
@@ -23,9 +24,27 @@ namespace xLib
 
     public delegate void xEventChangeState<TObject, TState>(TObject obj, TState state);
 
-    public struct xContent { public unsafe byte* Obj; public int Size; }
+    public interface IWindow
+    {
+        Window Window { get; set; }
 
-    public interface IRequestInfo { ushort Action { get; set; } ushort Size { get; set; } }
+        void Open();
+
+        void Close();
+    }
+
+    public struct xContent
+    {
+        public unsafe byte* Obj;
+        public int Size;
+    }
+
+    public interface IRequestInfo
+    {
+        ushort Action { get; set; }
+        ushort Size { get; set; }
+    }
+
     public struct RequestInfoT : IRequestInfo, IDataProvider
     {
         public ushort Action { get; set; }
@@ -46,7 +65,9 @@ namespace xLib
     }
 
     public interface IResponseInfo { ushort Action { get; set; } ushort Size { get; set; } }
+
     public interface IResponseAction<TAction> { TAction Action { get; set; } }
+
     public struct ResponseInfoT : IResponseAction<ushort>, IDataProvider
     {
         public ushort Action { get; set; }
