@@ -85,14 +85,14 @@
     </ControlTemplate>
 
     <ControlTemplate x:Key="MenuItemControlTemplate2" TargetType="{x:Type MenuItem}">
-        <Border x:Name="templateRoot" BorderBrush="#FF3F3F46" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" SnapsToDevicePixels="True">
-            <Grid Margin="-1">
+        <Border x:Name="templateRoot" HorizontalAlignment="Stretch" BorderBrush="#FF3F3F46" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" SnapsToDevicePixels="True">
+            <Grid Margin="-1" HorizontalAlignment="Left">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition MinWidth="22" SharedSizeGroup="MenuItemIconColumnGroup" Width="Auto"/>
-                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition MinWidth="10" Width="*"/>
+                    <ColumnDefinition Width="auto"/>
                 </Grid.ColumnDefinitions>
                 <ContentPresenter x:Name="menuHeaderContainer" ContentTemplate="{TemplateBinding HeaderTemplate}" Content="{TemplateBinding Header}" Grid.Column="1" ContentStringFormat="{TemplateBinding HeaderStringFormat}" ContentSource="Header" HorizontalAlignment="Left" Margin="{TemplateBinding Padding}" RecognizesAccessKey="True" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="Center"/>
-                <TextBlock x:Name="menuGestureText" Grid.Column="1" Margin="{TemplateBinding Padding}" Opacity="0.7" Text="{TemplateBinding InputGestureText}" VerticalAlignment="Center"/>
+                <TextBlock x:Name="menuGestureText" HorizontalAlignment="Left" Grid.Column="1" Margin="{TemplateBinding Padding}" Opacity="0.7" Text="{TemplateBinding InputGestureText}" VerticalAlignment="Center"/>
             </Grid>
         </Border>
         <ControlTemplate.Triggers>

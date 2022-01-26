@@ -49,9 +49,6 @@ namespace xLib.UI_Propertys
 
         protected string name = "";
         protected string note = "";
-        protected bool state = false;
-        protected bool is_writable = false;
-        protected bool is_enable = true;
         protected object code;
 
         protected object _value;
@@ -107,16 +104,6 @@ namespace xLib.UI_Propertys
             };
         }
 
-        public object TemplateSelector
-        {
-            get => null;
-            set
-            {
-                var a = value;
-                OnPropertyChanged(nameof(TemplateSelector));
-            }
-        }
-
         static UI_Property()
         {
             LinearGradientBrush myLinearGradientBrush = new LinearGradientBrush();
@@ -159,12 +146,6 @@ namespace xLib.UI_Propertys
         {
             set { code = value; OnPropertyChanged(nameof(Code)); }
             get { return code; }
-        }
-
-        public bool IsEnable
-        {
-            set { is_enable = value; OnPropertyChanged(nameof(IsEnable)); }
-            get { return is_enable; }
         }
 
         public Brush BackgroundValue
@@ -210,22 +191,27 @@ namespace xLib.UI_Propertys
             get => _value;
             set
             {
-                if (_value != null)
+                if (_value == null)
                 {
-                    try
-                    {
-                        var result = Convert.ChangeType(value, _value?.GetType());
-                        if (result != null) { value = result; }
-                    }
-                    catch { }
+                    _value = value;
+                    OnPropertyChanged(nameof(Value));
+                    EventValueChanged?.Invoke(this);
+                    BackgroundValue = BackgroundValueRule?.Invoke(this);
+                }
 
-                    if (Comparer<object>.Default.Compare(_value, value) != 0)
-                    {
-                        _value = value;
-                        OnPropertyChanged(nameof(Value));
-                        EventValueChanged?.Invoke(this);
-                        BackgroundValue = BackgroundValueRule?.Invoke(this);
-                    }
+                try
+                {
+                    var result = Convert.ChangeType(value, _value?.GetType());
+                    if (result != null) { value = result; }
+                }
+                catch { }
+
+                if (Comparer<object>.Default.Compare(_value, value) != 0)
+                {
+                    _value = value;
+                    OnPropertyChanged(nameof(Value));
+                    EventValueChanged?.Invoke(this);
+                    BackgroundValue = BackgroundValueRule?.Invoke(this);
                 }
             }
         }
@@ -235,22 +221,28 @@ namespace xLib.UI_Propertys
             get => _request;
             set
             {
-                if (_request != null)
+                if (_request == null)
                 {
-                    try
-                    {
-                        var result = Convert.ChangeType(value, _request?.GetType());
-                        if (result != null) { value = result; }
-                    }
-                    catch { }
+                    _request = value;
+                    OnPropertyChanged(nameof(Request));
+                    EventRequestChanged?.Invoke(this);
+                    BackgroundRequest = BackgroundRequestRule?.Invoke(this);
+                    return;
+                }
 
-                    if (Comparer<object>.Default.Compare(_request, value) != 0)
-                    {
-                        _request = value;
-                        OnPropertyChanged(nameof(Request));
-                        EventRequestChanged?.Invoke(this);
-                        BackgroundRequest = BackgroundRequestRule?.Invoke(this);
-                    }
+                try
+                {
+                    var result = Convert.ChangeType(value, _request?.GetType());
+                    if (result != null) { value = result; }
+                }
+                catch { }
+
+                if (Comparer<object>.Default.Compare(_request, value) != 0)
+                {
+                    _request = value;
+                    OnPropertyChanged(nameof(Request));
+                    EventRequestChanged?.Invoke(this);
+                    BackgroundRequest = BackgroundRequestRule?.Invoke(this);
                 }
             }
         }
@@ -324,33 +316,37 @@ namespace xLib.UI_Propertys
         public new xBackgroundRule<UI_Property<TValue, TRequest>> BackgroundValueRule;
         public new xBackgroundRule<UI_Property<TValue, TRequest>> BackgroundRequestRule;
 
-        public new TValue Value
+        public new virtual TValue Value
         {
-            get => _value != null ? (TValue)_value : default(TValue);
+            get => _value != null ? (TValue)_value : default;
             set
             {
-                if (_value != null && Comparer<TValue>.Default.Compare((TValue)_value, value) != 0)
+                if (value is not TValue || (_value != null && Comparer<TValue>.Default.Compare((TValue)_value, value) == 0))
                 {
-                    _value = value;
-                    OnPropertyChanged(nameof(Value));
-                    EventValueChanged?.Invoke(this);
-                    BackgroundValue = BackgroundValueRule?.Invoke(this);
+                    return;
                 }
+
+                _value = value;
+                OnPropertyChanged(nameof(Value));
+                EventValueChanged?.Invoke(this);
+                BackgroundValue = BackgroundValueRule?.Invoke(this);
             }
         }
 
-        public new TRequest Request
+        public new virtual TRequest Request
         {
-            get => _request != null ? (TRequest)_request : default(TRequest);
+            get => _request != null ? (TRequest)_request : default;
             set
             {
-                if (_request != null && Comparer<TRequest>.Default.Compare((TRequest)_request, value) != 0)
+                if (value is not TRequest || (_request != null && Comparer<TRequest>.Default.Compare((TRequest)_request, value) == 0))
                 {
-                    _request = value;
-                    OnPropertyChanged(nameof(Request));
-                    EventRequestChanged?.Invoke(this);
-                    BackgroundRequest = BackgroundRequestRule?.Invoke(this);
+                    return;
                 }
+
+                _request = value;
+                OnPropertyChanged(nameof(Request));
+                EventRequestChanged?.Invoke(this);
+                BackgroundRequest = BackgroundRequestRule?.Invoke(this);
             }
         }
 

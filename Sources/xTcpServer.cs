@@ -185,9 +185,6 @@ namespace xLib.Sources
             {
                 is_started = value;
 
-                Propertys.Ip.IsEnable = !value;
-                Propertys.Port.IsEnable = !value;
-
                 if (value) { Propertys.ButConnection.Value = "Stop"; Propertys.ButConnection.BackgroundValue = UI_Property.RED; }
                 else { Propertys.ButConnection.Value = "Start"; Propertys.ButConnection.BackgroundValue = UI_Property.GREEN; }
             }
