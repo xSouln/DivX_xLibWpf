@@ -41,7 +41,7 @@ namespace xLib
 
         public xTcp()
         {
-            BackgroundState = UI_Property.RED;
+            BackgroundState = UIProperty.RED;
         }
 
         public object BackgroundState
@@ -80,8 +80,8 @@ namespace xLib
                     OnPropertyChanged(nameof(IsConnected));
                 }
 
-                if (is_connected && background_state != UI_Property.GREEN) { BackgroundState = UI_Property.GREEN; }
-                else if (!is_connected && background_state != UI_Property.RED) { BackgroundState = UI_Property.RED; }
+                if (is_connected && background_state != UIProperty.GREEN) { BackgroundState = UIProperty.GREEN; }
+                else if (!is_connected && background_state != UIProperty.RED) { BackgroundState = UIProperty.RED; }
             }
         }
 

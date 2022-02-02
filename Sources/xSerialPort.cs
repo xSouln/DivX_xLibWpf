@@ -38,7 +38,7 @@ namespace xLib
         protected int boad_rate = 115200;
         protected string port_name = "";
         protected string last_selected_port_name = "";
-        protected Brush background_state = UI_Property.RED;
+        protected Brush background_state = UIProperty.RED;
 
         public xReceiver Receiver;
 
@@ -74,8 +74,8 @@ namespace xLib
             get { return is_connected; }
             set
             {
-                if (value && background_state != UI_Property.GREEN) { BackgroundState = UI_Property.GREEN; }
-                else if (!value && background_state != UI_Property.RED) { BackgroundState = UI_Property.RED; }
+                if (value && background_state != UIProperty.GREEN) { BackgroundState = UIProperty.GREEN; }
+                else if (!value && background_state != UIProperty.RED) { BackgroundState = UIProperty.RED; }
 
                 if (is_connected != value)
                 {

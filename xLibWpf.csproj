@@ -103,6 +103,10 @@
     <Compile Include="Sources\xHexReader.cs" />
     <Compile Include="Sources\xReceiver.cs" />
     <Compile Include="Sources\xTcpServer.cs" />
+    <Compile Include="Templates\TemplateComboBox.cs" />
+    <Compile Include="Templates\TemplateContentControl.cs" />
+    <Compile Include="Templates\TemplateTextBlock.cs" />
+    <Compile Include="Templates\TemplateTextBox.cs" />
     <Compile Include="Transceiver\xRequest.cs" />
     <Compile Include="Transceiver\xRequestBuilder.cs" />
     <Compile Include="Transceiver\xRequestLine.cs" />
@@ -113,10 +117,10 @@
     <Compile Include="Sources\xTracer.cs" />
     <Compile Include="Sources\xTypedef.cs" />
     <Compile Include="Transceiver\xResponseBuilder.cs" />
+    <Compile Include="UI_Propertys\UITemplateAdapter.cs" />
+    <Compile Include="UI_Propertys\UITemplateSelector.cs" />
     <Compile Include="UI_Propertys\UI_Button.cs" />
-    <Compile Include="UI_Propertys\UI_FProperty.cs" />
-    <Compile Include="UI_Propertys\UI_LoaderHandler.cs" />
-    <Compile Include="UI_Propertys\UI_Property.cs" />
+    <Compile Include="UI_Propertys\UIProperty.cs" />
     <Compile Include="xWindows\Resources\Init.cs" />
     <Compile Include="xWindows\WindowConfirmation.xaml.cs">
       <DependentUpon>WindowConfirmation.xaml</DependentUpon>

@@ -96,14 +96,50 @@ namespace xLib.Sources
             }
         }
         //=====================================================================================================================
+        public class Property<T> : UIProperty<T>
+        {
+            protected Brush background;
+
+            public Brush Background
+            {
+                get => background;
+                set
+                {
+                    background = value;
+                    OnPropertyChanged(nameof(Background));
+                }
+            }
+        }
+
+        public class PropertyIp : Property<string>
+        {
+            public override string Value
+            {
+                get => (string)_value;
+                set
+                {
+                    if (value != null && value.Split('.').Length == 4)
+                    {
+                        try
+                        {
+                            IPAddress.Parse(value);
+                            _value = value;
+                        }
+                        catch { }
+                        OnPropertyChanged(nameof(Value));
+                    }
+                }
+            }
+        }
+
         public class UIPropertys
         {
-            public UI_Property<string, string> Ip = new UI_Property<string, string>() { Name = nameof(Ip) };
-            public UI_Property<int, int> Port = new UI_Property<int, int>() { Name = nameof(Port) };
-            public UI_Property<int, int> Connections = new UI_Property<int, int>() { Name = nameof(Connections) };
-            public UI_Property<int, int> QueueSize = new UI_Property<int, int>() { Name = nameof(QueueSize) };
-            public UI_Property<bool, bool> IsStarted = new UI_Property<bool, bool>() { Name = nameof(IsStarted) };
-            public UI_Property<string, string> ButConnection = new UI_Property<string, string>() { Name = nameof(ButConnection) };
+            public Property<string> Ip = new Property<string>() { Name = nameof(Ip) };
+            public Property<int> Port = new Property<int>() { Name = nameof(Port) };
+            public Property<int> Connections = new Property<int>() { Name = nameof(Connections) };
+            public Property<int> QueueSize = new Property<int>() { Name = nameof(QueueSize) };
+            public Property<bool> IsStarted = new Property<bool>() { Name = nameof(IsStarted) };
+            public Property<string> ButConnection = new Property<string>() { Name = nameof(ButConnection) };
         }
         //=====================================================================================================================
         private TcpListener server;
@@ -112,12 +148,7 @@ namespace xLib.Sources
         private xList<ClientStream> clients = new xList<ClientStream>();
         private Semaphore semaphore_queue_size;
 
-        //private string ip = "127.0.0.10";
-        //private int port = 10000;
         private bool is_started;
-        //private Brush state_background;
-        //private string request_address;
-        //private int queue_size = 3;
         private int connection_count = 0;
 
         public xAction<string> Tracer;
@@ -125,28 +156,17 @@ namespace xLib.Sources
 
         public UIPropertys Propertys;
 
-        //private void trace(string note) { Tracer?.Invoke(note); xTracer.Message(note); }
         public xTcpServer()
         {
             Propertys = new UIPropertys()
             {
-                Ip =
-                {
-                    Value = "127.0.0.10",
-                    ValueParseRule = (last, request) =>
-                    {
-                        if (request.Split('.').Length != 4) { return last; }
-                        try { IPAddress.Parse(request); }
-                        catch { return last; }
-                        return request;
-                    }
-                },
-
+                Ip = { Value = "127.0.0.10" },
                 Port = { Value = 10000 },
                 QueueSize = { Value = 3 },
-                IsStarted = { BackgroundValueRule = (property) => { return property.Value ? UI_Property.GREEN : UI_Property.RED; } },
-                ButConnection = { Value = "Start", BackgroundValue = UI_Property.GREEN }
+                IsStarted = { EventValueChanged = (property, evt) => { ((Property<bool>)property).Background = property.Value ? UIProperty.GREEN : UIProperty.RED; } },
+                ButConnection = { Value = "Start", Background = UIProperty.GREEN }
             };
+
             clients.EventCountChanged += (arg) => { Propertys.Connections.Value = arg; };
         }
 
@@ -185,8 +205,8 @@ namespace xLib.Sources
             {
                 is_started = value;
 
-                if (value) { Propertys.ButConnection.Value = "Stop"; Propertys.ButConnection.BackgroundValue = UI_Property.RED; }
-                else { Propertys.ButConnection.Value = "Start"; Propertys.ButConnection.BackgroundValue = UI_Property.GREEN; }
+                if (value) { Propertys.ButConnection.Value = "Stop"; Propertys.ButConnection.Background = UIProperty.RED; }
+                else { Propertys.ButConnection.Value = "Start"; Propertys.ButConnection.Background = UIProperty.GREEN; }
             }
         }
 

@@ -22,7 +22,7 @@ namespace xLib
     public partial class WindowTerminal : Window
     {
         private static WindowTerminal window;
-        private UI_Button but_pause = new UI_Button("Resume", "Pause", UI_Property.RED, UI_Property.GREEN);
+        private UI_Button but_pause = new UI_Button("Resume", "Pause", UIProperty.RED, UIProperty.GREEN);
 
         public WindowTerminal()
         {
