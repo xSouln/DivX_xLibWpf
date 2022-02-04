@@ -65,13 +65,7 @@ namespace xLib.UI_Propertys
         public object Content;
 
         protected UITemplateAdapter template_adapter;
-        /*
-        public object RequestTemplate
-        {
-            get => null;
-            set => OnPropertyChanged(nameof(RequestTemplate));
-        }
-        */
+
         public UIProperty()
         {
             template_adapter = new TemplateContentControl();
@@ -117,6 +111,11 @@ namespace xLib.UI_Propertys
 
         }
 
+        protected virtual void ValueChanged()
+        {
+
+        }
+
         public virtual object GetValue() => _value;
 
         public virtual void Select()
@@ -128,21 +127,28 @@ namespace xLib.UI_Propertys
         {
             if (_value == null)
             {
-                _value = request;
-                UpdateValue();
-                return;
+                goto end;
             }
 
             if (request != null && _value.GetType() == request.GetType())
             {
                 try
                 {
-                    if (Comparer<object>.Default.Compare(_value, request) == 0) { return; }
+                    if (Comparer<object>.Default.Compare(_value, request) == 0)
+                    {
+                        return;
+                    }
                 }
                 catch { }
-                _value = request;
-                UpdateValue();
+                goto end;
             }
+
+            return;
+
+            end:;
+            _value = request;
+            UpdateValue();
+            ValueChanged();
         }
 
         protected static async Task<object> wait_value_state_async(UIProperty property, object state, int time)
@@ -191,7 +197,7 @@ namespace xLib.UI_Propertys
             _value = default(TValue);
         }
 
-        public UIProperty(UITemplateAdapter adapter) : base()
+        public UIProperty(UITemplateAdapter adapter)
         {
             _value = default(TValue);
             TemplateAdapter = adapter;
@@ -200,6 +206,10 @@ namespace xLib.UI_Propertys
         protected override void UpdateValue()
         {
             OnPropertyChanged(nameof(Value));
+        }
+
+        protected override void ValueChanged()
+        {
             EventValueChanged?.Invoke(this, new UIPropertyEvent());
         }
 
@@ -213,6 +223,7 @@ namespace xLib.UI_Propertys
 
                 _value = value;
                 UpdateValue();
+                ValueChanged();
             }
         }
     }
@@ -241,12 +252,20 @@ namespace xLib.UI_Propertys
         protected virtual void UpdateRequest()
         {
             OnPropertyChanged(nameof(Request));
+        }
+
+        protected virtual void RequestChanged()
+        {
             EventRequestChanged?.Invoke(this, new UIPropertyEvent());
         }
 
         protected override void UpdateValue()
         {
             OnPropertyChanged(nameof(Value));
+        }
+
+        protected override void ValueChanged()
+        {
             EventValueChanged?.Invoke(this, new UIPropertyEvent());
         }
 
@@ -255,11 +274,21 @@ namespace xLib.UI_Propertys
             get => _value != null ? (TValue)_value : default;
             set
             {
-                try { if (Comparer<object>.Default.Compare(_value, value) == 0) { return; } }
-                catch { }
+                try
+                {
+                    if (Comparer<object>.Default.Compare(_value, value) == 0)
+                    {
+                        return;
+                    }
+                }
+                catch
+                {
+
+                }
 
                 _value = value;
                 UpdateValue();
+                ValueChanged();
             }
         }
 
@@ -268,11 +297,21 @@ namespace xLib.UI_Propertys
             get => _request != null ? (TRequest)_request : default;
             set
             {
-                try { if (Comparer<object>.Default.Compare(_request, value) == 0) { return; } }
-                catch { }
+                try
+                {
+                    if (value != null && _request != null && Comparer<object>.Default.Compare(_request, value) == 0)
+                    {
+                        return;
+                    }
+                }
+                catch
+                {
+
+                }
 
                 _request = value;
                 UpdateRequest();
+                RequestChanged();
             }
         }
 

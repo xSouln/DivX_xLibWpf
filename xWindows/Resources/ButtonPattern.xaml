@@ -31,7 +31,7 @@
             Height="{TemplateBinding Height}"
             Width="{TemplateBinding Width}">
 
-            <ContentControl Margin="5"
+            <ContentControl
                 HorizontalAlignment="Center"
                 VerticalAlignment="Center"
                 Background="{TemplateBinding Background}"
@@ -59,9 +59,9 @@
                 <ControlTemplate>
                     <Border>
                         <Rectangle Margin="2"
-                     StrokeThickness="1"
-                     Stroke="#60000000"
-                     StrokeDashArray="1 2" />
+                             StrokeThickness="1"
+                             Stroke="#60000000"
+                             StrokeDashArray="1 2"/>
                     </Border>
                 </ControlTemplate>
             </Setter.Value>

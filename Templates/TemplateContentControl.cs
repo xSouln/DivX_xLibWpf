@@ -12,18 +12,21 @@ namespace xLib.Templates
 {
     public class TemplateContentControl : UITemplateAdapter
     {
-        public TemplateContentControl()
+        public TemplateContentControl() : this("Value")
+        {
+
+        }
+
+        public TemplateContentControl(string TextPropertyPath)
         {
             Element = new FrameworkElementFactory(typeof(ContentControl));
 
-            Element.SetBinding(ContentControl.ContentProperty, new Binding { Path = new PropertyPath("Value") });
+            if (TextPropertyPath != null)
+            {
+                Element.SetBinding(ContentControl.ContentProperty, new Binding { Path = new PropertyPath(TextPropertyPath) });
+            }
 
-            this.Template = new DataTemplate { VisualTree = Element };
-        }
-
-        public TemplateContentControl(string TextPropertyPath) : base()
-        {
-            Element.SetBinding(TextBlock.TextProperty, new Binding { Path = new PropertyPath(TextPropertyPath) });
+            Template = new DataTemplate { VisualTree = Element };
         }
     }
 }

@@ -20,5 +20,15 @@ namespace xLib.UI_Propertys
         }
 
         public virtual DataTemplate Template { get; set; }
+
+        public UITemplateAdapter()
+        {
+
+        }
+
+        public UITemplateAdapter(Type element_type)
+        {
+            Element = new FrameworkElementFactory(element_type);
+        }
     }
 }

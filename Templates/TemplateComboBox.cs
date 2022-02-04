@@ -30,8 +30,6 @@ namespace xLib.Templates
 
             Element.SetValue(FrameworkElement.HeightProperty, double.NaN);
 
-            //Element.SetBinding(ComboBox.TextProperty, new Binding { Path = new PropertyPath("Value") });
-
             grid.AppendChild(free);
             grid.AppendChild(Element);
 

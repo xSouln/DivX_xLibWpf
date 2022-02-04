@@ -103,6 +103,7 @@
     <Compile Include="Sources\xHexReader.cs" />
     <Compile Include="Sources\xReceiver.cs" />
     <Compile Include="Sources\xTcpServer.cs" />
+    <Compile Include="Templates\TemplateButton.cs" />
     <Compile Include="Templates\TemplateComboBox.cs" />
     <Compile Include="Templates\TemplateContentControl.cs" />
     <Compile Include="Templates\TemplateTextBlock.cs" />
