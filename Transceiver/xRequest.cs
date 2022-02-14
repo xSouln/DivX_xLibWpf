@@ -71,7 +71,10 @@ namespace xLib.Transceiver
                 if (requests.Count >= 20) { return false; }
                 requests.Add(request);
             }
-            finally { read_write_synchronize.Set(); }
+            finally
+            {
+                read_write_synchronize.Set();
+            }
             return true;
         }
 
@@ -87,7 +90,10 @@ namespace xLib.Transceiver
                     else { i++; }
                 }
             }
-            finally { read_write_synchronize.Set(); }
+            finally
+            {
+                read_write_synchronize.Set();
+            }
         }
 
         public bool Identification(xContent content)
@@ -109,7 +115,10 @@ namespace xLib.Transceiver
                     }
                 }
             }
-            finally { read_write_synchronize.Set(); }
+            finally
+            {
+                read_write_synchronize.Set();
+            }
             return result;
         }
 
@@ -131,7 +140,10 @@ namespace xLib.Transceiver
                     }
                 }
             }
-            finally { read_write_synchronize.Set(); }
+            finally
+            {
+                read_write_synchronize.Set();
+            }
             return result;
         }
     }

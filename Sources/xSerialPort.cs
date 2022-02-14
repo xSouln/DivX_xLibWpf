@@ -29,7 +29,6 @@ namespace xLib
 
         private Thread RxThread;
         private Timer timer_finde_ports;
-        //private Timer timer_update_rx;
 
         public SerialPort Port;
         public ObservableCollection<string> PortList { get; set; } = new ObservableCollection<string>();
@@ -44,7 +43,10 @@ namespace xLib
 
         public List<int> BaudRateList { get; set; } = new List<int>() { 9600, 38400, 115200, 128000, 256000, 521600, 840000, 900000, 921600 };
 
-        public xSerialPort() { timer_finde_ports = new Timer(finde_ports, null, 1000, 1000); }
+        public xSerialPort()
+        {
+            timer_finde_ports = new Timer(finde_ports, null, 1000, 1000);
+        }
 
         private void trace(string note) { Tracer?.Invoke(note); xTracer.Message(note); }
 
@@ -52,7 +54,12 @@ namespace xLib
 
         public xSerialPortOptions SerialPortOptions
         {
-            get { return new xSerialPortOptions { BoadRate = boad_rate, LastConnectedPortName = last_selected_port_name, ConnectionState = IsConnected }; }
+            get => new xSerialPortOptions
+            {
+                BoadRate = boad_rate,
+                LastConnectedPortName = last_selected_port_name,
+                ConnectionState = IsConnected
+            };
             set
             {
                 if (value != null)
