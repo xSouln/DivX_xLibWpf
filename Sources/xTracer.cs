@@ -22,9 +22,9 @@ namespace xLib
             {
                 PointEntryUI?.Invoke((RequestUI) =>
                 {
-                    if (Notes.Count > 500) Notes.RemoveAt(Notes.Count - 1);
+                    if (Info.Count > 500) Info.RemoveAt(Info.Count - 1);
 
-                    Notes.Insert(0, new ReceivePacketInfo
+                    Info.Insert(0, new ReceivePacketInfo
                     {
                         Time = DateTime.Now.ToUniversalTime().ToString(),
                         Note = note,

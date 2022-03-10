@@ -22,7 +22,7 @@ namespace xLib
             return 0;
         }
 
-        public static unsafe int MemCopy(byte[] Out, byte[] In, int Offset) { if(Out != null && In != null) fixed(byte* ptr = Out) { return MemCopy(ptr, In, In.Length, Offset); } return 0; }
+        public static unsafe int MemCopy(byte[] Out, byte[] In, int Offset) { if(Out != null && In != null) fixed (byte* ptr = Out) { return MemCopy(ptr, In, In.Length, Offset); } return 0; }
         public static unsafe int MemCopy(void* Out, void* In, int Size) { return MemCopy(Out, In, Size, 0); }
         public static unsafe int MemCopy(byte[] Out, void* In, int Size, int Offset) { if (Out != null && In != null) fixed (byte* ptr = Out) { return MemCopy(ptr, In, Size, Offset); } return 0; }
 

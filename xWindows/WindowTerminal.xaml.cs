@@ -34,7 +34,7 @@ namespace xLib
             ButPause.DataContext = but_pause;
         }
 
-        public static ObservableCollection<ReceivePacketInfo> NoteInfo { get; set; }
+        public static ObservableCollection<ReceivePacketInfo> NoteInfo { get; set; } = xTracer.Info;
 
         public static ObservableCollection<ReceivePacketInfo> NoteLog { get; set; } = xTracer.Notes;
 
