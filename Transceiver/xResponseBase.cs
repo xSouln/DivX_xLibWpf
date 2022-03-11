@@ -22,6 +22,8 @@ namespace xLib.Transceiver
 
         public event PropertyChangedEventHandler PropertyChanged;
 
+        public virtual xTransactionBase Parent { get; set; }
+
         protected void OnPropertyChanged(string propertyName)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));

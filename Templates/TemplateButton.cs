@@ -28,6 +28,7 @@ namespace xLib.Templates
 
             free.SetValue(UIElement.VisibilityProperty, Visibility.Hidden);
             free.SetValue(FrameworkElement.WidthProperty, 200.0);
+            /*
             free.SetBinding(FrameworkElement.HeightProperty, new Binding
             {
                 RelativeSource = new RelativeSource
@@ -36,7 +37,7 @@ namespace xLib.Templates
                 },
                 Path = new PropertyPath("Height")
             });
-
+            */
             Element.SetValue(Control.FontSizeProperty, 18.0);
             Element.SetValue(Control.ForegroundProperty, UIProperty.GetBrush("#FFDEC316"));
             Element.SetValue(Control.BackgroundProperty, UIProperty.GetBrush("#FF494849"));
