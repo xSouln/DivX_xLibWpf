@@ -91,11 +91,13 @@ namespace xLib
             try
             {
                 stream = client.GetStream();
+                stream.Flush();
                 IsConnected = true;
                 trace("tcp client: thread start");
+                client.ReceiveBufferSize = 1000000;
 
                 int count = 0;
-                byte[] buf = new byte[100000];
+                byte[] buf = new byte[1000000];
                 Receiver.Clear();
 
                 while (true)

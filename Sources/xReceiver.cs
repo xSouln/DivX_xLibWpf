@@ -42,6 +42,7 @@ namespace xLib
         }
         private unsafe void BufLoaded()
         {
+            /*
             if (EventPacketReceive != null)
             {
                 xReceiverData data = new xReceiverData();
@@ -53,6 +54,7 @@ namespace xLib
                     EventPacketReceive(data);
                 }
             }
+            */
             Buf.ByteRecived = 0;
         }
 

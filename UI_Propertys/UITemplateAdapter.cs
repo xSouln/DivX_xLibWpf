@@ -13,6 +13,8 @@ namespace xLib.UI_Propertys
 
         public virtual FrameworkElementFactory Element { get; set; }
 
+        public virtual object Parent { get; set; }
+
         public virtual FrameworkElement Container
         {
             get => container;
