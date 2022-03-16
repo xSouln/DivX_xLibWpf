@@ -11,17 +11,32 @@ namespace xLib.UI_Propertys
     {
         protected FrameworkElement container;
 
-        public virtual FrameworkElementFactory Element { get; set; }
+        public virtual FrameworkElementFactory Element
+        {
+            get;
+            set;
+        }
 
-        public virtual object Parent { get; set; }
+        public virtual object Parent
+        {
+            get;
+            set;
+        }
 
         public virtual FrameworkElement Container
         {
             get => container;
-            set => container = value;
+            set
+            {
+                container = value;
+            }
         }
 
-        public virtual DataTemplate Template { get; set; }
+        public virtual DataTemplate Template
+        {
+            get;
+            set;
+        }
 
         public UITemplateAdapter()
         {

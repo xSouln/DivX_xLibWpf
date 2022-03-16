@@ -13,36 +13,6 @@ using xLib.Templates;
 
 namespace xLib.UI_Propertys
 {
-    public interface IUI_PropertyEvents
-    {
-        void Select();
-    }
-
-    public interface IUI_PropertyValue<TValue>
-    {
-        TValue Value { get; set; }
-    }
-
-    public interface IUI_PropertyRequest<TRequest>
-    {
-        TRequest Request { get; set; }
-    }
-
-    public interface IUI_Code
-    {
-        int Code { get; set; }
-    }
-
-    public abstract class NotifyPropertyChanged : INotifyPropertyChanged
-    {
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        protected void OnPropertyChanged(string propertyName)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-    }
-
     public class UIPropertyEvent
     {
 
@@ -68,7 +38,7 @@ namespace xLib.UI_Propertys
 
         public UIProperty()
         {
-            template_adapter = new TemplateContentControl();
+            template_adapter = new TemplateContentControl("Value");
         }
 
         public UIProperty(UITemplateAdapter adapter)
@@ -76,7 +46,7 @@ namespace xLib.UI_Propertys
             TemplateAdapter = adapter;
         }
 
-        public UITemplateAdapter TemplateAdapter
+        public virtual UITemplateAdapter TemplateAdapter
         {
             get => template_adapter;
             set
@@ -106,7 +76,7 @@ namespace xLib.UI_Propertys
             get => code;
         }
 
-        protected virtual void UpdateValue()
+        protected virtual void ValueUpdate()
         {
 
         }
@@ -116,7 +86,10 @@ namespace xLib.UI_Propertys
 
         }
 
-        public virtual object GetValue() => _value;
+        public virtual object GetValue()
+        {
+            return _value;
+        }
 
         public virtual void Select()
         {
@@ -147,7 +120,7 @@ namespace xLib.UI_Propertys
 
             end:;
             _value = request;
-            UpdateValue();
+            ValueUpdate();
             ValueChanged();
         }
 
@@ -195,15 +168,25 @@ namespace xLib.UI_Propertys
         public UIProperty() : base()
         {
             _value = default(TValue);
+
+            TemplateAdapter = new TemplateContentControl("Value");
         }
 
         public UIProperty(UITemplateAdapter adapter)
         {
             _value = default(TValue);
-            TemplateAdapter = adapter;
+
+            if (adapter == null)
+            {
+                TemplateAdapter = new TemplateContentControl(null);
+            }
+            else
+            {
+                TemplateAdapter = adapter;
+            }
         }
 
-        protected override void UpdateValue()
+        protected override void ValueUpdate()
         {
             OnPropertyChanged(nameof(Value));
         }
@@ -222,19 +205,30 @@ namespace xLib.UI_Propertys
                 catch { }
 
                 _value = value;
-                UpdateValue();
+                ValueUpdate();
                 ValueChanged();
             }
         }
     }
 
-    public class UIProperty<TValue, TRequest> : UIProperty
+    public interface IRequestProperty
+    {
+        UITemplateAdapter RequestTemplateAdapter { get; set; }
+        void RequestUpdate();
+        void RequestChanged();
+        object GetRequest();
+        void SetRequest(object request);
+    }
+
+    public class UIProperty<TValue, TRequest> : UIProperty, IRequestProperty
     {
         protected object _request;
 
         public UIPropertyEventHandler<UIProperty<TValue, TRequest>, UIPropertyEvent> EventSelection;
         public UIPropertyEventHandler<UIProperty<TValue, TRequest>, UIPropertyEvent> EventValueChanged;
         public UIPropertyEventHandler<UIProperty<TValue, TRequest>, UIPropertyEvent> EventRequestChanged;
+
+        public virtual UITemplateAdapter RequestTemplateAdapter { get; set; }
 
         public UIProperty() : base()
         {
@@ -246,22 +240,24 @@ namespace xLib.UI_Propertys
         {
             _value = default(TValue);
             _request = default(TRequest);
+
             TemplateAdapter = adapter;
+            RequestTemplateAdapter = new TemplateContentControl(nameof(Request));
         }
 
-        protected virtual void UpdateRequest()
+        public UIProperty(UITemplateAdapter adapter, UITemplateAdapter requestAdapter) : this(adapter)
+        {
+            RequestTemplateAdapter = requestAdapter;
+        }
+
+        public virtual void RequestUpdate()
         {
             OnPropertyChanged(nameof(Request));
         }
 
-        protected virtual void RequestChanged()
+        public virtual void RequestChanged()
         {
             EventRequestChanged?.Invoke(this, new UIPropertyEvent());
-        }
-
-        protected override void UpdateValue()
-        {
-            OnPropertyChanged(nameof(Value));
         }
 
         protected override void ValueChanged()
@@ -287,8 +283,21 @@ namespace xLib.UI_Propertys
                 }
 
                 _value = value;
-                UpdateValue();
+                ValueUpdate();
                 ValueChanged();
+            }
+        }
+
+        public object GetRequest()
+        {
+            return _request;
+        }
+
+        public void SetRequest(object request)
+        {
+            if (request != null && request.GetType() == typeof(TRequest))
+            {
+                Request = (TRequest)request;
             }
         }
 
@@ -310,14 +319,9 @@ namespace xLib.UI_Propertys
                 }
 
                 _request = value;
-                UpdateRequest();
+                RequestUpdate();
                 RequestChanged();
             }
-        }
-
-        public override void Select()
-        {
-
         }
     }
 }
