@@ -78,7 +78,7 @@ namespace xLib.UI_Propertys
 
         protected virtual void ValueUpdate()
         {
-
+            OnPropertyChanged(nameof(Value));
         }
 
         protected virtual void ValueChanged()
@@ -86,42 +86,36 @@ namespace xLib.UI_Propertys
 
         }
 
-        public virtual object GetValue()
+        public virtual object Value
         {
-            return _value;
+            get => _value;
+            set
+            {
+                if (value != null && _value.GetType() == value.GetType())
+                {
+                    try
+                    {
+                        if (Comparer<object>.Default.Compare(_value, value) == 0)
+                        {
+                            return;
+                        }
+                    }
+                    catch { }
+                    goto end;
+                }
+
+                return;
+
+                end:;
+                _value = value;
+                ValueUpdate();
+                ValueChanged();
+            }
         }
 
         public virtual void Select()
         {
 
-        }
-
-        public virtual void SetValue(object request)
-        {
-            if (_value == null)
-            {
-                goto end;
-            }
-
-            if (request != null && _value.GetType() == request.GetType())
-            {
-                try
-                {
-                    if (Comparer<object>.Default.Compare(_value, request) == 0)
-                    {
-                        return;
-                    }
-                }
-                catch { }
-                goto end;
-            }
-
-            return;
-
-            end:;
-            _value = request;
-            ValueUpdate();
-            ValueChanged();
         }
 
         protected static async Task<object> wait_value_state_async(UIProperty property, object state, int time)
@@ -186,17 +180,12 @@ namespace xLib.UI_Propertys
             }
         }
 
-        protected override void ValueUpdate()
-        {
-            OnPropertyChanged(nameof(Value));
-        }
-
         protected override void ValueChanged()
         {
             EventValueChanged?.Invoke(this, new UIPropertyEvent());
         }
 
-        public virtual TValue Value
+        public new virtual TValue Value
         {
             get => _value != null ? (TValue)_value : default;
             set
@@ -265,7 +254,7 @@ namespace xLib.UI_Propertys
             EventValueChanged?.Invoke(this, new UIPropertyEvent());
         }
 
-        public virtual TValue Value
+        public new virtual TValue Value
         {
             get => _value != null ? (TValue)_value : default;
             set
