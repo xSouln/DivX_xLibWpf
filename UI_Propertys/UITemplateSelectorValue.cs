@@ -32,7 +32,7 @@ namespace xLib.UI_Propertys
             return new DataTemplate
             {
                 VisualTree = new FrameworkElementFactory(typeof(ContentControl))
-        };
+            };
         }
     }
 }

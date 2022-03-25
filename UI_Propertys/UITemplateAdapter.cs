@@ -46,6 +46,11 @@ namespace xLib.UI_Propertys
         public UITemplateAdapter(Type element_type)
         {
             Element = new FrameworkElementFactory(element_type);
+
+            Template = new DataTemplate
+            {
+                VisualTree = Element
+            };
         }
     }
 }
