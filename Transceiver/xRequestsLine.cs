@@ -9,11 +9,11 @@ using xLib.UI_Propertys;
 
 namespace xLib.Transceiver
 {
-    public class xTransactionLine : NotifyPropertyChanged
+    public class xRequestsLine : NotifyPropertyChanged
     {
         public class Result
         {
-            public List<xRequest> Requests;
+            public List<xRequestBase> Requests;
             public ETransactionState State;
             public long ResponseTime;
         }
@@ -25,16 +25,16 @@ namespace xLib.Transceiver
         private int response_time_out = 300;
         private int update_period = 1000;
         private bool update_enable;
-        private List<xRequest> requests;
+        private List<xRequestBase> requests;
 
         public Func<xAction<bool, byte[]>> RequstTransmitter;
 
         private CancellationTokenSource cancel_token_source;
 
-        public List<xRequest> Requests
+        public List<xRequestBase> Requests
         {
-            set { requests = value; }
-            get { return requests; }
+            set => requests = value;
+            get => requests;
         }
 
         public xAction<bool, byte[]> Transmitter
@@ -61,9 +61,9 @@ namespace xLib.Transceiver
             set { update_enable = value; OnPropertyChanged(nameof(UpdateEnable)); }
         }
 
-        public xTransactionLine() { Dispose(); }
+        public xRequestsLine() { Dispose(); }
 
-        public xTransactionLine(List<xRequest> requests, xAction<bool, byte[]> transmitter, int try_count, int response_time_out)
+        public xRequestsLine(List<xRequestBase> requests, xAction<bool, byte[]> transmitter, int try_count, int response_time_out)
         {
             Dispose();
             this.requests = requests;
@@ -84,7 +84,7 @@ namespace xLib.Transceiver
                 if (response_time_out < 100) { response_time_out = 100; }
 
                 stop_watch.Start();
-                foreach (xRequest transaction in requests)
+                foreach (xRequestBase transaction in requests)
                 {
                     var res = await transaction.TransmitionAsync(transmitter, try_count, response_time_out);
 
@@ -103,7 +103,7 @@ namespace xLib.Transceiver
             return result;
         }
 
-        public static async Task<Result> Transmit(List<xRequest> requests, xAction<bool, byte[]> transmitter, int try_count, int response_time_out, xAction<string> tracer)
+        public static async Task<Result> Transmit(List<xRequestBase> requests, xAction<bool, byte[]> transmitter, int try_count, int response_time_out, xAction<string> tracer)
         {
             Result result = null;
 
@@ -115,7 +115,7 @@ namespace xLib.Transceiver
                 if (response_time_out < 100) { response_time_out = 100; }
 
                 stop_watch.Start();
-                foreach (xRequest transaction in requests)
+                foreach (xRequestBase transaction in requests)
                 {
                     var res = await transaction.TransmitionAsync(transmitter, try_count, response_time_out);
 
@@ -162,7 +162,7 @@ namespace xLib.Transceiver
                         if (RequstTransmitter != null) { action_transmitter = RequstTransmitter(); }
 
                         stop_watch.Restart();
-                        foreach (xRequest transaction in requests)
+                        foreach (xRequestBase transaction in requests)
                         {
                             //if (!transaction.) { goto end_foreach; }
 
@@ -179,7 +179,6 @@ namespace xLib.Transceiver
                                     );
                             }
                             else { Tracer?.Invoke("Transmition result: " + "null"); break; }
-                        end_foreach:;
                         }
 
                         delay -= stop_watch.ElapsedMilliseconds;

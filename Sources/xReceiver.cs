@@ -6,7 +6,11 @@ using System.Threading.Tasks;
 
 namespace xLib
 {
-    public enum xRxResponse { Accept = 0, Storage = 1, BanTransition = 2 }
+    public enum xRxResponse
+    {
+        Reset,
+        Storage,
+    }
 
     public unsafe class xReceiverData
     {
@@ -22,11 +26,11 @@ namespace xLib
             public int ByteRecived;
         }
 
-        public xEvent<xReceiverData> EventPacketReceive;
+        public xAction<xRxResponse, xReceiverData> EventPacketReceive;
 
         public byte[] EndLine;
         public xReceiverBufT Buf = new xReceiverBufT();
-        public xRxResponse Response = xRxResponse.Accept;
+        public xRxResponse Response = xRxResponse.Reset;
         public object Context;
 
         public xReceiver(int BufSize, byte[] EndLine)
@@ -42,19 +46,6 @@ namespace xLib
         }
         private unsafe void BufLoaded()
         {
-            /*
-            if (EventPacketReceive != null)
-            {
-                xReceiverData data = new xReceiverData();
-                data.xRx = this;
-                data.Content.Size = Buf.ByteRecived;
-                fixed (byte* ptr = Buf.Data)
-                {
-                    data.Content.Obj = ptr;
-                    EventPacketReceive(data);
-                }
-            }
-            */
             Buf.ByteRecived = 0;
         }
 
@@ -62,18 +53,17 @@ namespace xLib
         {
             if (EventPacketReceive != null)
             {
-                Response = xRxResponse.Accept;
                 xReceiverData data = new xReceiverData();
                 data.xRx = this;
                 data.Content.Size = Buf.ByteRecived - EndLine.Length;
                 fixed (byte* ptr = Buf.Data)
                 {
                     data.Content.Obj = ptr;
-                    EventPacketReceive(data);
+                    Response = EventPacketReceive(data);
                 }
             }
 
-            if (Response == xRxResponse.Accept)
+            if (Response == xRxResponse.Reset)
             {
                 Buf.ByteRecived = 0;
             }
@@ -109,7 +99,7 @@ namespace xLib
 
         public void Clear()
         {
-            Response = xRxResponse.Accept;
+            Response = xRxResponse.Reset;
             Buf.ByteRecived = 0;
         }
     }

@@ -8,8 +8,6 @@ namespace xLib
 {
     public class ReceivePacketInfo
     {
-        private string convert_data = "";
-
         public string Time { get; set; } = "";
 
         public string Note { get; set; } = "";

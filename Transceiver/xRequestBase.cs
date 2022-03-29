@@ -8,7 +8,16 @@ using System.Threading.Tasks;
 
 namespace xLib.Transceiver
 {
-    public class xRequest
+    public interface IDataProvider
+    {
+        int GetSize();
+
+        void SetSize(int size);
+
+        void GetData(List<byte> data);
+    }
+
+    public class xRequestBase
     {
         protected xAction<bool, byte[]> transmitter;
         protected int try_count = 1;
@@ -27,11 +36,11 @@ namespace xLib.Transceiver
 
         public byte[] Data;
 
-        public xEvent<xRequest> EventTimeOut;
+        public xEvent<xRequestBase> EventTimeOut;
 
-        public virtual xTransactionBase Parent { get; set; }
+        //public virtual xTransactionBase Parent { get; set; }
 
-        public virtual xTransactionHandler Handler { get; set; }
+        public virtual xRequestsHandler Handler { get; set; }
 
         public virtual xEvent<string> Tracer { get; set; }
 
@@ -83,7 +92,7 @@ namespace xLib.Transceiver
             }
         }
 
-        protected static void transmit_action(xRequest request)
+        protected static void transmit_action(xRequestBase request)
         {
             try
             {
@@ -105,15 +114,18 @@ namespace xLib.Transceiver
                     else
                     {
                         request.transmission_state = ETransactionState.TimeOut;
-                        request.Tracer?.Invoke("TimeOut: " + request.Parent.Name);
+                        request.Tracer?.Invoke("TimeOut: " + request.Name);
                         request.EventTimeOut?.Invoke(request);
                     }
                 }
             }
-            finally { request.transmition_synchronize.Set(); }
+            finally
+            {
+                request.transmition_synchronize.Set();
+            }
         }
 
-        protected virtual xRequest transmition()
+        protected virtual xRequestBase transmition()
         {
             try
             {
@@ -161,7 +173,7 @@ namespace xLib.Transceiver
             return this;
         }
 
-        protected virtual async Task<xRequest> transmition_async()
+        protected virtual async Task<xRequestBase> transmition_async()
         {
             try
             {
@@ -218,7 +230,7 @@ namespace xLib.Transceiver
             Handler?.Remove(this);
         }
 
-        public virtual xRequest Transmition(xAction<bool, byte[]> transmitter, int try_count, int response_time_out)
+        public virtual xRequestBase Transmition(xAction<bool, byte[]> transmitter, int try_count, int response_time_out)
         {
             if (transmitter == null || try_count <= 0 || response_time_out <= 0 || transmission_state != ETransactionState.Free) { return null; }
             this.transmitter = transmitter;
@@ -230,7 +242,7 @@ namespace xLib.Transceiver
             return result;
         }
 
-        public static TRequest Transmition<TRequest>(TRequest request, xAction<bool, byte[]> transmitter, int try_count, int response_time_out) where TRequest : xRequest
+        public static TRequest Transmition<TRequest>(TRequest request, xAction<bool, byte[]> transmitter, int try_count, int response_time_out) where TRequest : xRequestBase
         {
             if (transmitter == null || try_count <= 0 || response_time_out <= 0 || request.transmission_state != ETransactionState.Free) { return null; }
 
@@ -243,7 +255,7 @@ namespace xLib.Transceiver
             return (TRequest)result;
         }
 
-        public virtual async Task<xRequest> TransmitionAsync(xAction<bool, byte[]> transmitter, int try_count, int response_time_out)
+        public virtual async Task<xRequestBase> TransmitionAsync(xAction<bool, byte[]> transmitter, int try_count, int response_time_out)
         {
             if (transmitter == null || try_count <= 0 || response_time_out <= 0 || transmission_state != ETransactionState.Free) { return null; }
             this.transmitter = transmitter;
@@ -256,7 +268,7 @@ namespace xLib.Transceiver
             return result;
         }
 
-        public static async Task<TRequest> TransmitionAsync<TRequest>(TRequest request, xAction<bool, byte[]> transmitter, int try_count, int response_time, CancellationTokenSource cancellation) where TRequest : xRequest
+        public static async Task<TRequest> TransmitionAsync<TRequest>(TRequest request, xAction<bool, byte[]> transmitter, int try_count, int response_time, CancellationTokenSource cancellation) where TRequest : xRequestBase
         {
             if (transmitter == null || try_count <= 0 || response_time <= 0 || request.transmission_state != ETransactionState.Free) { return null; }
 
@@ -271,7 +283,7 @@ namespace xLib.Transceiver
             return (TRequest)result;
         }
 
-        public static async Task<TRequest> TransmitionAsync<TRequest>(TRequest request, xAction<bool, byte[]> transmitter, int try_count, int response_time) where TRequest : xRequest
+        public static async Task<TRequest> TransmitionAsync<TRequest>(TRequest request, xAction<bool, byte[]> transmitter, int try_count, int response_time) where TRequest : xRequestBase
         {
             if (transmitter == null || try_count <= 0 || response_time <= 0 || request.transmission_state != ETransactionState.Free) { return null; }
 

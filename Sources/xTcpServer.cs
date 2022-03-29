@@ -152,7 +152,7 @@ namespace xLib.Sources
         private int connection_count = 0;
 
         public xAction<string> Tracer;
-        public xEvent<xReceiverData> EventReceivePacket;
+        public xAction<xRxResponse, xReceiverData> EventReceivePacket;
 
         public UIPropertys Propertys;
 

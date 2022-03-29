@@ -20,20 +20,20 @@ namespace xLib.Transceiver
         AddError
     }
 
-    public class xTransactionHandler
+    public class xRequestsHandler
     {
-        protected List<xRequest> transactions = new List<xRequest>();
+        protected List<xRequestBase> transactions = new List<xRequestBase>();
         protected AutoResetEvent read_write_synchronize = new AutoResetEvent(true);
         protected Semaphore queue_size;
         protected Thread thread;
 
-        public xTransactionHandler(int line_size)
+        public xRequestsHandler(int line_size)
         {
             if (line_size < 1) { line_size = 10; }
             queue_size = new Semaphore(line_size, line_size);
         }
 
-        public xTransactionHandler()
+        public xRequestsHandler()
         {
             queue_size = new Semaphore(10, 10);
             //thread = new Thread(thread_handler);
@@ -66,14 +66,17 @@ namespace xLib.Transceiver
             }
         }
 
-        public virtual bool Add(xRequest request)
+        public virtual bool Add(xRequestBase request)
         {
             try
             {
                 read_write_synchronize.WaitOne();
 
                 requests_update();
-                if (transactions.Count >= 20) { return false; }
+                if (transactions.Count >= 20)
+                {
+                    return false;
+                }
                 transactions.Add(request);
             }
             finally
@@ -83,7 +86,7 @@ namespace xLib.Transceiver
             return true;
         }
 
-        public virtual void Remove(xRequest request)
+        public virtual void Remove(xRequestBase request)
         {
             try
             {
@@ -91,8 +94,14 @@ namespace xLib.Transceiver
 
                 for (int i = 0; i < this.transactions.Count; i++)
                 {
-                    if (this.transactions[i] == request) { this.transactions.RemoveAt(i); }
-                    else { i++; }
+                    if (this.transactions[i] == request)
+                    {
+                        transactions.RemoveAt(i);
+                    }
+                    else
+                    {
+                        i++;
+                    }
                 }
             }
             finally
