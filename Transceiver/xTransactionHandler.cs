@@ -22,7 +22,7 @@ namespace xLib.Transceiver
 
     public class xTransactionHandler
     {
-        protected List<xTransactionBase> transactions = new List<xTransactionBase>();
+        protected List<xRequest> transactions = new List<xRequest>();
         protected AutoResetEvent read_write_synchronize = new AutoResetEvent(true);
         protected Semaphore queue_size;
         protected Thread thread;
@@ -45,10 +45,10 @@ namespace xLib.Transceiver
             int i = 0;
             while (i < transactions.Count)
             {
-                switch (transactions[i].Request.TransmissionState)
+                switch (transactions[i].TransmissionState)
                 {
                     case ETransactionState.Complite:
-                        transactions[i].Request.Accept();
+                        transactions[i].Accept();
                         transactions.RemoveAt(i);
                         break;
 
@@ -66,7 +66,7 @@ namespace xLib.Transceiver
             }
         }
 
-        public virtual bool Add(xTransactionBase request)
+        public virtual bool Add(xRequest request)
         {
             try
             {
@@ -83,7 +83,7 @@ namespace xLib.Transceiver
             return true;
         }
 
-        public virtual void Remove(xTransactionBase request)
+        public virtual void Remove(xRequest request)
         {
             try
             {
@@ -114,7 +114,7 @@ namespace xLib.Transceiver
                     result = transactions[i].Response.Identification(content);
                     if (result)
                     {
-                        transactions[i].Request.Accept();
+                        transactions[i].Accept();
                         transactions.RemoveAt(i);
                         break;
                     }

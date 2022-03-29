@@ -22,6 +22,7 @@ namespace xLib.Transceiver
 
         protected volatile bool is_transmit_action;
         protected volatile bool is_accept;
+        protected xResponseBase response;
         //public bool IsNotify = true;
 
         public byte[] Data;
@@ -34,11 +35,17 @@ namespace xLib.Transceiver
 
         public virtual xEvent<string> Tracer { get; set; }
 
-        public string Name => Parent?.Name;
+        public string Name { get; set; }
 
         public int ResponseTimeOut => response_time_out;
 
         public long ResponseTime => response_time;
+
+        public virtual xResponseBase Response
+        {
+            get => response;
+            set => response = value;
+        }
 
         public int TryCount
         {
@@ -89,11 +96,11 @@ namespace xLib.Transceiver
                         if (request.transmitter == null || !request.transmitter(request.Data))
                         {
                             request.transmission_state = ETransactionState.ErrorTransmite;
-                            request.Tracer?.Invoke("Transmit: " + request.Parent.Name + " " + request.transmission_state);
+                            request.Tracer?.Invoke("Transmit: " + request.Name + " " + request.transmission_state);
                             return;
                         }
                         request.try_number++;
-                        request.Tracer?.Invoke("Transmit: " + request.Parent.Name + " try: " + request.try_number);
+                        request.Tracer?.Invoke("Transmit: " + request.Name + " try: " + request.try_number);
                     }
                     else
                     {
@@ -115,7 +122,7 @@ namespace xLib.Transceiver
                 if (transmission_state != ETransactionState.Free) { return this; }
                 transmission_state = ETransactionState.Prepare;
 
-                if (!(bool)Handler?.Add(Parent))
+                if (!(bool)Handler?.Add(this))
                 {
                     transmission_state = ETransactionState.Busy;
                     return this;
@@ -163,7 +170,7 @@ namespace xLib.Transceiver
                 if (transmission_state != ETransactionState.Free) { return this; }
                 transmission_state = ETransactionState.Prepare;
 
-                if (!(bool)Handler?.Add(Parent))
+                if (!(bool)Handler?.Add(this))
                 {
                     transmission_state = ETransactionState.Busy;
                     return this;
@@ -208,7 +215,7 @@ namespace xLib.Transceiver
             transmission_state = ETransactionState.Free;
             transmition_synchronize.Set();
 
-            Handler?.Remove(Parent);
+            Handler?.Remove(this);
         }
 
         public virtual xRequest Transmition(xAction<bool, byte[]> transmitter, int try_count, int response_time_out)
