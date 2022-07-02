@@ -106,7 +106,7 @@ namespace xLib.UI_Propertys
 
                 return;
 
-                end:;
+            end:;
                 _value = value;
                 ValueUpdate();
                 ValueChanged();

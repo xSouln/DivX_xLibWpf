@@ -83,7 +83,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="Sources\xCBase.cs" />
+    <Compile Include="Charting\GraphAdapterBase.cs" />
+    <Compile Include="Charting\PointsAdapterBase.cs" />
+    <Compile Include="Sources\xMemory.cs" />
     <Compile Include="Sources\xCommunicationControl.cs" />
     <Compile Include="Sources\xList.cs" />
     <Compile Include="Sources\xSerialPort.cs" />
@@ -114,19 +116,19 @@
     <Compile Include="UI_Propertys\UITemplateSelectorValue.cs" />
     <Compile Include="UI_Propertys\UI_Button.cs" />
     <Compile Include="UI_Propertys\UIProperty.cs" />
-    <Compile Include="xWindows\Resources\Init.cs" />
-    <Compile Include="xWindows\WindowConfirmation.xaml.cs">
+    <Compile Include="Windows\Resources\Init.cs" />
+    <Compile Include="Windows\WindowConfirmation.xaml.cs">
       <DependentUpon>WindowConfirmation.xaml</DependentUpon>
     </Compile>
-    <Compile Include="xWindows\WindowTcpServer.xaml.cs">
+    <Compile Include="Windows\WindowTcpServer.xaml.cs">
       <DependentUpon>WindowTcpServer.xaml</DependentUpon>
     </Compile>
-    <Compile Include="xWindows\WindowTerminal.xaml.cs" />
-    <Compile Include="xWindows\WindowSerialPort.xaml.cs" />
-    <Compile Include="xWindows\WindowTcpConnection.xaml.cs">
+    <Compile Include="Windows\WindowTerminal.xaml.cs" />
+    <Compile Include="Windows\WindowSerialPort.xaml.cs" />
+    <Compile Include="Windows\WindowTcpConnection.xaml.cs">
       <DependentUpon>WindowTcpConnection.xaml</DependentUpon>
     </Compile>
-    <Compile Include="xWindows\WindowValueSetter.xaml.cs">
+    <Compile Include="Windows\WindowValueSetter.xaml.cs">
       <DependentUpon>WindowValueSetter.xaml</DependentUpon>
     </Compile>
     <Page Include="MainWindow.xaml">
@@ -143,47 +145,47 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="xWindows\Resources\ButtonPattern.xaml">
+    <Page Include="Windows\Resources\ButtonPattern.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="xWindows\Resources\ListViewPattern.xaml">
+    <Page Include="Windows\Resources\ListViewPattern.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="xWindows\Resources\MenuPattern.xaml">
+    <Page Include="Windows\Resources\MenuPattern.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="xWindows\Resources\TabItemPattern.xaml">
+    <Page Include="Windows\Resources\TabItemPattern.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="xWindows\Resources\TextBoxPattern.xaml">
+    <Page Include="Windows\Resources\TextBoxPattern.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="xWindows\WindowConfirmation.xaml">
+    <Page Include="Windows\WindowConfirmation.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="xWindows\WindowTcpServer.xaml">
+    <Page Include="Windows\WindowTcpServer.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="xWindows\WindowTerminal.xaml">
+    <Page Include="Windows\WindowTerminal.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="xWindows\WindowSerialPort.xaml">
+    <Page Include="Windows\WindowSerialPort.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="xWindows\WindowTcpConnection.xaml">
+    <Page Include="Windows\WindowTcpConnection.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="xWindows\WindowValueSetter.xaml">
+    <Page Include="Windows\WindowValueSetter.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -227,5 +229,6 @@
       <Install>false</Install>
     </BootstrapperPackage>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -6,11 +6,11 @@
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="pack://application:,,,/xLibWpf;component/xWindows/Resources/MenuPattern.xaml"/>
-                <ResourceDictionary Source="pack://application:,,,/xLibWpf;component/xWindows/Resources/ButtonPattern.xaml"/>
-                <ResourceDictionary Source="pack://application:,,,/xLibWpf;component/xWindows/Resources/TextBoxPattern.xaml"/>
-                <ResourceDictionary Source="pack://application:,,,/xLibWpf;component/xWindows/Resources/ListViewPattern.xaml"/>
-                <ResourceDictionary Source="pack://application:,,,/xLibWpf;component/xWindows/Resources/TabItemPattern.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/xLibWpf;component/Windows/Resources/MenuPattern.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/xLibWpf;component/Windows/Resources/ButtonPattern.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/xLibWpf;component/Windows/Resources/TextBoxPattern.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/xLibWpf;component/Windows/Resources/ListViewPattern.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/xLibWpf;component/Windows/Resources/TabItemPattern.xaml"/>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Application.Resources>

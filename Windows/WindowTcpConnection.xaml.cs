@@ -48,10 +48,22 @@ namespace xLib
                 window.Closed += new EventHandler(Close_Click);
                 window.Show();
             }
-            else window.Activate();
+            else
+            {
+                window.Activate();
+            }
         }
 
-        public static void Close_Click(object sender, EventArgs e) { window?.Close(); window = null; }
-        public static void Dispose() { window?.Close(); window = null; }
+        public static void Close_Click(object sender, EventArgs e)
+        {
+            window?.Close();
+            window = null;
+        }
+
+        public static void Dispose()
+        {
+            window?.Close();
+            window = null;
+        }
     }
 }
