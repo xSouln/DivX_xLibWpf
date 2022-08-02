@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace xLib
+namespace xLib.Common
 {
     public class xConverter
     {
@@ -38,9 +38,9 @@ namespace xLib
 
         public static unsafe bool Compare(string str, xContent content)
         {
-            if (str == null || str.Length == 0 || str.Length > content.Size) { return false; }
+            if (str == null || str.Length == 0 || str.Length > content.DataSize) { return false; }
 
-            for (int i = 0; i < str.Length; i++) { if (str[i] != content.Obj[i]) { return false; } }
+            for (int i = 0; i < str.Length; i++) { if (str[i] != content.Data[i]) { return false; } }
             return true;
         }
 
@@ -308,7 +308,7 @@ namespace xLib
         }
         public static unsafe string GetString(void* obj, int obj_size) { return GetString(obj, 0, obj_size); }
 
-        public static unsafe string GetString(xContent content) { return GetString(content.Obj, 0, content.Size); }
+        public static unsafe string GetString(xContent content) { return GetString(content.Data, 0, content.DataSize); }
 
         public static unsafe string GetString(void* obj, int obj_size, char end) { return GetString(obj, 0, obj_size, end); }
         //===============================================================================================================================================================================

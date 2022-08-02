@@ -7,7 +7,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 
-namespace xLib.UI_Propertys
+namespace xLib.UI
 {
     public class UITemplateSelectorValue : DataTemplateSelector
     {

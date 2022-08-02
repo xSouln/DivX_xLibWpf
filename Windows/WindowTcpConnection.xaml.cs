@@ -13,7 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using xLib.Transceiver;
 
-namespace xLib
+namespace xLib.Windows
 {
     /// <summary>
     /// Логика взаимодействия для WindowTcpConnection.xaml
@@ -21,7 +21,7 @@ namespace xLib
     public partial class WindowTcpConnection : Window
     {
         public static WindowTcpConnection window;
-        public static xTcp Tcp;
+        public static Net.TCP_Client Tcp;
         public WindowTcpConnection()
         {
             InitializeComponent();

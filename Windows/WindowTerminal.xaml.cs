@@ -12,9 +12,10 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
-using xLib.UI_Propertys;
+using xLib.Common;
+using xLib.UI;
 
-namespace xLib
+namespace xLib.Windows
 {
     /// <summary>
     /// Логика взаимодействия для InfoWindow.xaml
@@ -22,7 +23,7 @@ namespace xLib
     public partial class WindowTerminal : Window
     {
         private static WindowTerminal window;
-        private UI_Button but_pause = new UI_Button("Resume", "Pause", UIProperty.RED, UIProperty.GREEN);
+        private UIButton but_pause = new UIButton("Resume", "Pause", UIProperty.RED, UIProperty.GREEN);
 
         public WindowTerminal()
         {

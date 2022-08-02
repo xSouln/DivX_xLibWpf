@@ -12,9 +12,10 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
-using xLib.Sources;
+using xLib.Common;
+using xLib.Net;
 
-namespace xLib.xWindows
+namespace xLib.Windows
 {
     /// <summary>
     /// Логика взаимодействия для WindowTcpServer.xaml
@@ -22,7 +23,7 @@ namespace xLib.xWindows
     public partial class WindowTcpServer : Window
     {
         public static WindowTcpServer window;
-        public static xTcpServer TcpServer;
+        public static TCP_Server TcpServer;
         public static ObservableCollection<object> Propertys { get; set; }
 
         public WindowTcpServer()

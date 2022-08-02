@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 
-namespace xLib.UI_Propertys
+namespace xLib.UI
 {
     public class UITemplateAdapter
     {
@@ -17,19 +17,10 @@ namespace xLib.UI_Propertys
             set;
         }
 
-        public virtual object Parent
-        {
-            get;
-            set;
-        }
-
         public virtual FrameworkElement Container
         {
             get => container;
-            set
-            {
-                container = value;
-            }
+            set => container = value;
         }
 
         public virtual DataTemplate Template
@@ -52,5 +43,10 @@ namespace xLib.UI_Propertys
                 VisualTree = Element
             };
         }
+    }
+
+    public interface ITemplateAdapter
+    {
+        UITemplateAdapter TemplateAdapter { get; set; }
     }
 }

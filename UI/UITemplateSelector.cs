@@ -6,30 +6,22 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 
-namespace xLib.UI_Propertys
+namespace xLib.UI
 {
     public class UITemplateSelector : DataTemplateSelector
     {
         public override DataTemplate SelectTemplate(object item, DependencyObject container)
         {
-            //return item is UIProperty property ? property.TemplateAdapter?.Template : null;
-
-            UIProperty property = item as UIProperty;
-
-            if (property != null)
+            if (item != null && item is ITemplateAdapter request)
             {
-                if (property is IRequestProperty request)
-                {
-                    return request.RequestTemplateAdapter?.Template;
-                }
-
-                return property.TemplateAdapter?.Template;
+                return request.TemplateAdapter?.Template;
             }
 
             return new DataTemplate
             {
                 VisualTree = new FrameworkElementFactory(typeof(ContentControl))
             };
+
         }
     }
 }

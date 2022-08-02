@@ -5,11 +5,11 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using xLib.UI_Propertys;
+using xLib.UI;
 
 namespace xLib.Transceiver
 {
-    public class xRequestsLine : NotifyPropertyChanged
+    public class xRequestsLine : UINotifyPropertyChanged
     {
         public class Result
         {
@@ -25,17 +25,11 @@ namespace xLib.Transceiver
         private int response_time_out = 300;
         private int update_period = 1000;
         private bool update_enable;
-        private List<xRequestBase> requests;
-
         public Func<xAction<bool, byte[]>> RequstTransmitter;
 
         private CancellationTokenSource cancel_token_source;
 
-        public List<xRequestBase> Requests
-        {
-            set => requests = value;
-            get => requests;
-        }
+        public List<xRequestBase> Requests { set; get; }
 
         public xAction<bool, byte[]> Transmitter
         {
@@ -66,7 +60,7 @@ namespace xLib.Transceiver
         public xRequestsLine(List<xRequestBase> requests, xAction<bool, byte[]> transmitter, int try_count, int response_time_out)
         {
             Dispose();
-            this.requests = requests;
+            this.Requests = requests;
             this.transmitter = transmitter;
             this.try_count = try_count;
             this.response_time_out = response_time_out;
@@ -76,15 +70,15 @@ namespace xLib.Transceiver
         {
             Result result = null;
 
-            if (requests != null && requests.Count > 0 && transmitter != null && try_count > 0)
+            if (Requests != null && Requests.Count > 0 && transmitter != null && try_count > 0)
             {
-                result = new Result { Requests = requests };
+                result = new Result { Requests = Requests };
                 Stopwatch stop_watch = new Stopwatch();
 
                 if (response_time_out < 100) { response_time_out = 100; }
 
                 stop_watch.Start();
-                foreach (xRequestBase transaction in requests)
+                foreach (xRequestBase transaction in Requests)
                 {
                     var res = await transaction.TransmitionAsync(transmitter, try_count, response_time_out);
 
@@ -162,7 +156,7 @@ namespace xLib.Transceiver
                         if (RequstTransmitter != null) { action_transmitter = RequstTransmitter(); }
 
                         stop_watch.Restart();
-                        foreach (xRequestBase transaction in requests)
+                        foreach (xRequestBase transaction in Requests)
                         {
                             //if (!transaction.) { goto end_foreach; }
 

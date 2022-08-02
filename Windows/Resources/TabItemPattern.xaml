@@ -102,7 +102,6 @@
                             <Setter TargetName="Border" Property="Background" Value="{StaticResource TabItemSelected1}" />
                             <Setter TargetName="Border" Property="BorderThickness" Value="0,0,0,0" />
                         </Trigger>
-
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>
@@ -127,7 +126,7 @@
                                           Margin="0,1,0,0"
                                           RecognizesAccessKey="True">
                             <ContentPresenter.LayoutTransform>
-                                <RotateTransform Angle="90"/>
+                                <RotateTransform Angle="270"/>
                             </ContentPresenter.LayoutTransform>
                         </ContentPresenter>
                     </Border>

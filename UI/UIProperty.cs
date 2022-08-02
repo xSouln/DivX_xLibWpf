@@ -11,7 +11,7 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using xLib.Templates;
 
-namespace xLib.UI_Propertys
+namespace xLib.UI
 {
     public class UIPropertyEvent
     {
@@ -20,10 +20,18 @@ namespace xLib.UI_Propertys
 
     public delegate void UIPropertyEventHandler<TProperty, TEvent>(TProperty property, TEvent evt) where TProperty : UIProperty where TEvent : UIPropertyEvent;
 
-    public abstract class UIProperty : NotifyPropertyChanged
+    public interface IValueProperty
+    {
+        UITemplateAdapter ValueTemplateAdapter { get; set; }
+        void ValueUpdate();
+        void ValueChanged();
+        object GetValue();
+        void SetValue(object value);
+    }
+
+    public abstract class UIProperty : UINotifyPropertyChanged, ITemplateAdapter
     {
         protected string name = "";
-        protected object code;
 
         protected object _value;
 
@@ -68,12 +76,6 @@ namespace xLib.UI_Propertys
         {
             set { name = value; OnPropertyChanged(nameof(Name)); }
             get => name;
-        }
-
-        public virtual object Code
-        {
-            set { code = value; OnPropertyChanged(nameof(Code)); }
-            get => code;
         }
 
         protected virtual void ValueUpdate()
@@ -200,9 +202,13 @@ namespace xLib.UI_Propertys
         }
     }
 
-    public interface IRequestProperty
+    public interface IRequestTemplateAdapter
     {
         UITemplateAdapter RequestTemplateAdapter { get; set; }
+    }
+
+    public interface IRequestProperty : IRequestTemplateAdapter
+    {
         void RequestUpdate();
         void RequestChanged();
         object GetRequest();

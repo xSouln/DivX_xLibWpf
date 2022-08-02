@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Text;
-using xLib.Sources;
+using xLib.Common;
 using xLib.Transceiver;
 
-namespace xLib
+namespace xLib.Common
 {
     public class xMemory
     {

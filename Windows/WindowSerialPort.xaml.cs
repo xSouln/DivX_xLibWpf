@@ -13,9 +13,10 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using xLib.Net;
 using xLib.Transceiver;
 
-namespace xLib
+namespace xLib.Windows
 {
     /// <summary>
     /// Логика взаимодействия для WindowComPortConnection.xaml
@@ -23,16 +24,16 @@ namespace xLib
     public partial class WindowSerialPort : Window
     {
         public static WindowSerialPort window;
-        public static xSerialPort SerialPort;
+        public static Ports.xSerialPort SerialPort { get; set; }
 
         public WindowSerialPort()
         {
             InitializeComponent();
 
             GridPropertys.DataContext = SerialPort;
-            DataContext = this;
+            ButConnection.DataContext = SerialPort?.ButtonConnection;
 
-            //if (SerialPort != null) { SerialPort.SerialPortOptions = Properties.Settings.Default.SerialPortOptions; }
+            DataContext = this;
 
             Closed += WindowSerialPortClosed;
         }
@@ -46,18 +47,20 @@ namespace xLib
         {
             if (FindComPortsBox.SelectedIndex != -1)
             {
-                SerialPort?.Connect((string)FindComPortsBox.SelectedValue);
+                if ((bool)SerialPort?.IsConnected)
+                {
+                    SerialPort?.Disconnect();
+                }
+                else
+                {
+                    SerialPort?.Connect((string)FindComPortsBox.SelectedValue);
+                }
             }
         }
 
         private void DisconnectBut_Click(object sender, RoutedEventArgs e)
         {
             SerialPort?.Disconnect();
-        }
-
-        private void TransmitBut_Click(object sender, RoutedEventArgs e)
-        {
-            if (TransmitDataTextBox.Text.Length > 0) { SerialPort?.Send(TransmitDataTextBox.Text); }
         }
 
         public static void OpenClick(object sender, RoutedEventArgs e)

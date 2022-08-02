@@ -6,20 +6,15 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 
-namespace xLib.UI_Propertys
+namespace xLib.UI
 {
     public class UITemplateSelectorRequest : DataTemplateSelector
     {
         public override DataTemplate SelectTemplate(object item, DependencyObject container)
         {
-            UIProperty property = item as UIProperty;
-
-            if (property != null)
+            if (item != null && item is IRequestTemplateAdapter request)
             {
-                if (property is IRequestProperty request)
-                {
-                    return request.RequestTemplateAdapter?.Template;
-                }
+                return request.RequestTemplateAdapter?.Template;
             }
 
             return new DataTemplate

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace xLib
+namespace xLib.Common
 {
     public static class xHexReader
     {

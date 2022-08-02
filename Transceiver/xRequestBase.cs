@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using xLib.Common;
 
 namespace xLib.Transceiver
 {
@@ -23,7 +24,7 @@ namespace xLib.Transceiver
         protected int try_count = 1;
         protected int try_number = 0;
         protected int response_time_out = 100;
-        protected long response_time = 0;
+        protected int response_time = 0;
         protected Timer timer_transmiter;
         protected volatile ETransactionState transmission_state;
 
@@ -32,6 +33,7 @@ namespace xLib.Transceiver
         protected volatile bool is_transmit_action;
         protected volatile bool is_accept;
         protected xResponseBase response;
+        protected xRequestHandle handle;
         //public bool IsNotify = true;
 
         public byte[] Data;
@@ -40,7 +42,11 @@ namespace xLib.Transceiver
 
         //public virtual xTransactionBase Parent { get; set; }
 
-        public virtual xRequestsHandler Handler { get; set; }
+        public virtual xRequestHandle Handle
+        {
+            get => handle;
+            set => handle = value;
+        }
 
         public virtual xEvent<string> Tracer { get; set; }
 
@@ -48,7 +54,7 @@ namespace xLib.Transceiver
 
         public int ResponseTimeOut => response_time_out;
 
-        public long ResponseTime => response_time;
+        public int ResponseTime => response_time;
 
         public virtual xResponseBase Response
         {
@@ -134,7 +140,7 @@ namespace xLib.Transceiver
                 if (transmission_state != ETransactionState.Free) { return this; }
                 transmission_state = ETransactionState.Prepare;
 
-                if (!(bool)Handler?.Add(this))
+                if (!(bool)Handle?.Add(this))
                 {
                     transmission_state = ETransactionState.Busy;
                     return this;
@@ -169,7 +175,7 @@ namespace xLib.Transceiver
 
             time_transmition.Stop();
             time_transmit_action.Stop();
-            response_time = time_transmition.ElapsedMilliseconds;
+            response_time = (int)time_transmition.ElapsedMilliseconds;
             return this;
         }
 
@@ -182,7 +188,7 @@ namespace xLib.Transceiver
                 if (transmission_state != ETransactionState.Free) { return this; }
                 transmission_state = ETransactionState.Prepare;
 
-                if (!(bool)Handler?.Add(this))
+                if (!(bool)Handle?.Add(this))
                 {
                     transmission_state = ETransactionState.Busy;
                     return this;
@@ -217,7 +223,7 @@ namespace xLib.Transceiver
 
             time_transmition.Stop();
             time_transmit_action.Stop();
-            response_time = time_transmition.ElapsedMilliseconds;
+            response_time = (int)time_transmition.ElapsedMilliseconds;
             return this;
         }
 
@@ -227,7 +233,7 @@ namespace xLib.Transceiver
             transmission_state = ETransactionState.Free;
             transmition_synchronize.Set();
 
-            Handler?.Remove(this);
+            Handle?.Remove(this);
         }
 
         public virtual xRequestBase Transmition(xAction<bool, byte[]> transmitter, int try_count, int response_time_out)
@@ -294,6 +300,18 @@ namespace xLib.Transceiver
 
             var result = await Task.Run(() => request.transmition());
             return (TRequest)result;
+        }
+
+        public static void Trace(string context, xRequestBase request)
+        {
+            if (request != null)
+            {
+                xTracer.Message(request.Name + " " + request.TransmissionState + ", response time: " + request.ResponseTime);
+            }
+            else
+            {
+                xTracer.Message("" + context + " request = null");
+            }
         }
     }
 }

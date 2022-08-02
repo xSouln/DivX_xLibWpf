@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace xLib.Sources
+namespace xLib.Common
 {
     public class xList<TObject>
     {

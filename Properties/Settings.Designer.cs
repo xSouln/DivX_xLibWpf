@@ -25,9 +25,9 @@ namespace xLib.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        public global::xLib.xSerialPortOptions SerialPortOptions {
+        public global::xLib.Ports.Options SerialPortOptions {
             get {
-                return ((global::xLib.xSerialPortOptions)(this["SerialPortOptions"]));
+                return ((global::xLib.Ports.Options)(this["SerialPortOptions"]));
             }
             set {
                 this["SerialPortOptions"] = value;

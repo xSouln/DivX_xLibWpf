@@ -7,15 +7,16 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Media;
-using xLib.UI_Propertys;
+using xLib.Common;
+using xLib.UI;
 
-namespace xLib.Sources
+namespace xLib.Net
 {
-    public class xTcpServer : NotifyPropertyChanged
+    public class TCP_Server : UINotifyPropertyChanged
     {
         public class ClientStream
         {
-            private xReceiver receiver;
+            private xObjectReceiver receiver;
             private Thread thread;
             private TcpClient client;
             private Semaphore semaphore;
@@ -54,7 +55,7 @@ namespace xLib.Sources
                 }
             }
 
-            public ClientStream(Semaphore semaphore, xList<ClientStream> list, TcpClient client, xReceiver receiver)
+            public ClientStream(Semaphore semaphore, xList<ClientStream> list, TcpClient client, xObjectReceiver receiver)
             {
                 Dispose();
 
@@ -63,7 +64,7 @@ namespace xLib.Sources
                 this.receiver = receiver;
                 this.list = list;
 
-                receiver.Context = this;
+                receiver.Parent = this;
 
                 thread = new Thread(thred_handler);
                 thread.Start();
@@ -152,11 +153,11 @@ namespace xLib.Sources
         private int connection_count = 0;
 
         public xAction<string> Tracer;
-        public xAction<xRxResponse, xReceiverData> EventReceivePacket;
+        public xObjectReceiver.EventPacketReceive PacketReceiver;
 
         public UIPropertys Propertys;
 
-        public xTcpServer()
+        public TCP_Server()
         {
             Propertys = new UIPropertys()
             {
@@ -227,7 +228,10 @@ namespace xLib.Sources
                     TcpClient client = server.AcceptTcpClient();
 
                     xTracer.Message("tcp server: client accept");
-                    new ClientStream(semaphore_queue_size, clients, client, new xReceiver(10000, new byte[] { (byte)'\r' }) { EventPacketReceive = EventReceivePacket });
+                    new ClientStream(semaphore_queue_size, clients, client, new xObjectReceiver(10000, new byte[] { (byte)'\r' })
+                    {
+                        PacketReceiver = PacketReceiver
+                    });
                 }
             }
             catch (Exception ex)

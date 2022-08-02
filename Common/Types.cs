@@ -35,20 +35,22 @@ namespace xLib
 
     public struct xContent
     {
-        public unsafe byte* Obj;
-        public int Size;
+        public unsafe byte* Data;
+        public int DataSize;
     }
 
     public interface IRequestInfo
     {
         ushort Action { get; set; }
         ushort Size { get; set; }
+        //ushort PacketId { get; set; }
     }
 
     public struct RequestInfoT : IRequestInfo, IDataProvider
     {
         public ushort Action { get; set; }
         public ushort Size { get; set; }
+        //public ushort PacketId { get; set; }
 
         public unsafe int GetSize() => sizeof(RequestInfoT);
         public void SetSize(int size) { Size = (ushort)size; }
@@ -64,7 +66,12 @@ namespace xLib
         }
     }
 
-    public interface IResponseInfo { ushort Action { get; set; } ushort Size { get; set; } }
+    public interface IResponseInfo
+    {
+        ushort Action { get; set; }
+        ushort Size { get; set; }
+        //ushort PacketId { get; set; }
+    }
 
     public interface IResponseAction<TAction> { TAction Action { get; set; } }
 
@@ -72,6 +79,7 @@ namespace xLib
     {
         public ushort Action { get; set; }
         public ushort Size { get; set; }
+        //ushort PacketId { get; set; }
         public unsafe int GetSize() => sizeof(RequestInfoT);
         public void SetSize(int size) { Size = (ushort)size; }
 

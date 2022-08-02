@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
-using xLib.UI_Propertys;
+using xLib.UI;
 
 namespace xLib.Templates
 {

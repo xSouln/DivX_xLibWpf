@@ -6,21 +6,57 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Windows.Media;
+using xLib.Common;
 using xLib.Transceiver;
-using xLib.UI_Propertys;
+using xLib.UI;
 
-namespace xLib
+namespace xLib.Ports
 {
-    [Serializable]
-    public class xSerialPortOptions
+    public partial class xSerialPort : UINotifyPropertyChanged
     {
-        public int BoadRate = 115200;
-        public bool ConnectionState = false;
-        public string LastConnectedPortName = "";
-    }
+        public class UI_ButtonConnection : UINotifyPropertyChanged
+        {
+            private const string name_connected = "Disconnect";
+            private const string name_disconnected = "Connect";
 
-    public class xSerialPort : NotifyPropertyChanged
-    {
+            private static Brush background_disconnected = UIProperty.RED;
+            private static Brush background_connected = UIProperty.GREEN;
+
+            private Brush background = background_disconnected;
+            private string name = name_disconnected;
+
+            private bool state;
+
+            public string Name => name;
+
+            public Brush Background => background;
+
+            public bool IsEnabled
+            {
+                set
+                {
+                    if (state != value)
+                    {
+                        state = value;
+
+                        if (value)
+                        {
+                            background = background_connected;
+                            name = name_connected;
+                        }
+                        else
+                        {
+                            background = background_disconnected;
+                            name = name_disconnected;
+                        }
+
+                        OnPropertyChanged(nameof(Name));
+                        OnPropertyChanged(nameof(Background));
+                    }
+                }
+            }
+        }
+
         public const string FILE_NAME_COMPORT_OPTIONS = "ComPortOption.xDat";
         public xAction<string> Tracer;
 
@@ -30,7 +66,7 @@ namespace xLib
         private Thread RxThread;
         private Timer timer_finde_ports;
 
-        public SerialPort Port;
+        public System.IO.Ports.SerialPort Port;
         public ObservableCollection<string> PortList { get; set; } = new ObservableCollection<string>();
 
         protected bool is_connected;
@@ -39,7 +75,9 @@ namespace xLib
         protected string last_selected_port_name = "";
         protected Brush background_state = UIProperty.RED;
 
-        public xReceiver Receiver;
+        public UI_ButtonConnection ButtonConnection { get; set; } = new UI_ButtonConnection();
+
+        public xObjectReceiver Receiver;
 
         public List<int> BaudRateList { get; set; } = new List<int>() { 9600, 38400, 115200, 128000, 256000, 521600, 840000, 900000, 921600 };
 
@@ -48,13 +86,17 @@ namespace xLib
             timer_finde_ports = new Timer(finde_ports, null, 1000, 1000);
         }
 
-        private void trace(string note) { Tracer?.Invoke(note); xTracer.Message(note); }
+        private void trace(string note)
+        {
+            //Tracer?.Invoke(note);
+            xTracer.Message(note);
+        }
 
         public bool SelectIsEnable => !IsConnected;
 
-        public xSerialPortOptions SerialPortOptions
+        public Options SerialPortOptions
         {
-            get => new xSerialPortOptions
+            get => new Options
             {
                 BoadRate = boad_rate,
                 LastConnectedPortName = last_selected_port_name,
@@ -72,17 +114,27 @@ namespace xLib
 
         public Brush BackgroundState
         {
-            get { return background_state; }
-            set { background_state = value; OnPropertyChanged(nameof(BackgroundState)); }
+            get => background_state;
+            set
+            {
+                background_state = value;
+                OnPropertyChanged(nameof(BackgroundState));
+            }
         }
 
         public bool IsConnected
         {
-            get { return is_connected; }
+            get => is_connected;
             set
             {
-                if (value && background_state != UIProperty.GREEN) { BackgroundState = UIProperty.GREEN; }
-                else if (!value && background_state != UIProperty.RED) { BackgroundState = UIProperty.RED; }
+                if (value && background_state != UIProperty.GREEN)
+                {
+                    BackgroundState = UIProperty.GREEN;
+                }
+                else if (!value && background_state != UIProperty.RED)
+                {
+                    BackgroundState = UIProperty.RED;
+                }
 
                 if (is_connected != value)
                 {
@@ -91,23 +143,28 @@ namespace xLib
                     OnPropertyChanged(nameof(SelectIsEnable));
                     ConnectionStateChanged?.Invoke(this, value);
                 }
+
+                ButtonConnection.IsEnabled = value;
             }
         }
 
         public string PortName
         {
-            get { return port_name; }
+            get => port_name;
             set
             {
                 port_name = value;
-                if (port_name.Length > 0) { last_selected_port_name = value; }
+                if (port_name.Length > 0)
+                {
+                    last_selected_port_name = value;
+                }
                 OnPropertyChanged(nameof(PortName));
             }
         }
 
         public int BoadRate
         {
-            get { return boad_rate; }
+            get => boad_rate;
             set
             {
                 if (boad_rate != value)
@@ -140,13 +197,24 @@ namespace xLib
 
         public bool Connect(string name)
         {
-            if (name == null || name.Length < 3) { return false; }
-            if (Port != null && Port.IsOpen) { return false; }
+            if (name == null || name.Length < 3)
+            {
+                return false;
+            }
+
+            if (Port != null && Port.IsOpen)
+            {
+                return false;
+            }
 
             try
             {
-                if (Receiver == null) { Receiver = new xReceiver(50000, new byte[] { (byte)'\r', (byte)'\n' }); }
-                Port = new SerialPort(name, BoadRate, Parity.None, 8, StopBits.One);
+                if (Receiver == null)
+                {
+                    Receiver = new xObjectReceiver(50000, new byte[] { (byte)'\r', (byte)'\n' });
+                }
+
+                Port = new System.IO.Ports.SerialPort(name, BoadRate, Parity.None, 8, StopBits.One);
                 Port.Encoding = Encoding.GetEncoding("iso-8859-1");
                 Port.ReadBufferSize = 100000;
                 Port.WriteBufferSize = 100000;
@@ -194,10 +262,23 @@ namespace xLib
             foreach (string name in res.remove)
             {
                 int i = 0;
-                while (i < res.ports.Count) { if (xConverter.Compare(name, res.ports[i])) { res.ports.RemoveAt(i); } else { i++; } }
+                while (i < res.ports.Count)
+                {
+                    if (xConverter.Compare(name, res.ports[i]))
+                    {
+                        res.ports.RemoveAt(i);
+                    }
+                    else
+                    {
+                        i++;
+                    }
+                }
             }
 
-            foreach (string name in res.add) { res.ports.Add(name); }
+            foreach (string name in res.add)
+            {
+                res.ports.Add(name);
+            }
         }
 
         private void finde_ports(object obj)
@@ -224,26 +305,41 @@ namespace xLib
                 int j = 0;
                 while (j < Ports.Count)
                 {
-                    if (xConverter.Compare(TotalPorts[i], Ports[j])) { TotalPorts.RemoveAt(i); Ports.RemoveAt(j); goto end_while; }
+                    if (xConverter.Compare(TotalPorts[i], Ports[j]))
+                    {
+                        TotalPorts.RemoveAt(i);
+                        Ports.RemoveAt(j);
+                        goto end_while;
+                    }
                     j++;
                 }
                 i++;
             end_while:;
             }
 
-            if (TotalPorts.Count != Ports.Count || count != TotalPorts.Count) { xSupport.ActionThreadUI<(ObservableCollection<string>, List<string>, List<string>)>(update_port_list, (PortList, TotalPorts, Ports)); }
+            if (TotalPorts.Count != Ports.Count || count != TotalPorts.Count)
+            {
+                xSupport.ActionThreadUI<(ObservableCollection<string>, List<string>, List<string>)>(update_port_list, (PortList, TotalPorts, Ports));
+            }
         }
 
         public bool Send(string str)
         {
-            if (Port == null || !Port.IsOpen || str == null || str.Length == 0) { return false; }
+            if (Port == null || !Port.IsOpen || str == null || str.Length == 0)
+            {
+                return false;
+            }
             Port.Write(str);
             return true;
         }
 
         public bool Send(byte[] data)
         {
-            if (Port != null && Port.IsOpen && data != null && data.Length > 0) { Port.Write(data, 0, data.Length); return true; }
+            if (Port != null && Port.IsOpen && data != null && data.Length > 0)
+            {
+                Port.Write(data, 0, data.Length);
+                return true;
+            }
             return false;
         }
     }

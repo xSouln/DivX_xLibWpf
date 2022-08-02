@@ -4,9 +4,9 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using xLib.UI_Propertys;
+using xLib.UI;
 
-namespace xLib
+namespace xLib.Common
 {
     public static class xTracer
     {

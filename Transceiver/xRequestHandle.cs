@@ -20,20 +20,20 @@ namespace xLib.Transceiver
         AddError
     }
 
-    public class xRequestsHandler
+    public class xRequestHandle
     {
         protected List<xRequestBase> transactions = new List<xRequestBase>();
         protected AutoResetEvent read_write_synchronize = new AutoResetEvent(true);
         protected Semaphore queue_size;
         protected Thread thread;
 
-        public xRequestsHandler(int line_size)
+        public xRequestHandle(int line_size)
         {
             if (line_size < 1) { line_size = 10; }
             queue_size = new Semaphore(line_size, line_size);
         }
 
-        public xRequestsHandler()
+        public xRequestHandle()
         {
             queue_size = new Semaphore(10, 10);
             //thread = new Thread(thread_handler);

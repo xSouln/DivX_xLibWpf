@@ -8,16 +8,17 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Media;
 using xLib;
-using xLib.UI_Propertys;
+using xLib.Common;
+using xLib.UI;
 
-namespace xLib
+namespace xLib.Net
 {
-    public class xTcp : NotifyPropertyChanged
+    public class TCP_Client : UINotifyPropertyChanged
     {
         private object background_state;
 
-        public xEvent<xTcp> EventDisconnected;
-        public xEvent<xTcp> EventConnected;
+        public xEvent<TCP_Client> EventDisconnected;
+        public xEvent<TCP_Client> EventConnected;
 
         public xAction<string> Tracer;
         private TcpClient client;
@@ -36,10 +37,14 @@ namespace xLib
         private AutoResetEvent transmit_line_synchronizer = new AutoResetEvent(true);
         private Thread transmit_line_thread;
 
-        public xReceiver Receiver;
-        private void trace(string note) { Tracer?.Invoke(note); xTracer.Message(note); }
+        public xObjectReceiver Receiver;
+        private void trace(string note)
+        {
+            Tracer?.Invoke(note);
+            xTracer.Message(note);
+        }
 
-        public xTcp()
+        public TCP_Client()
         {
             BackgroundState = UIProperty.RED;
         }
@@ -87,9 +92,14 @@ namespace xLib
 
         private void rx_thread()
         {
-            if (client == null) { trace("tcp client: client == null"); thread_close(); }
+            if (client == null)
+            {
+                trace("tcp client: client == null");
+                thread_close();
+            }
             try
             {
+                client.ReceiveBufferSize = 0x10000;
                 stream = client.GetStream();
                 stream.Flush();
                 IsConnected = true;
@@ -105,18 +115,37 @@ namespace xLib
                     do
                     {
                         count = stream.Read(buf, 0, buf.Length);
-                        if (count > 0) { for (int i = 0; i < count; i++) Receiver.Add(buf[i]); }
+                        for (int i = 0; i < count; i++)
+                        {
+                            Receiver.Add(buf[i]);
+                        }
                     }
                     while ((bool)stream?.DataAvailable);
                 }
             }
-            catch (Exception e) { trace(e.ToString()); thread_close(); }
+            catch (Exception e)
+            {
+                trace(e.ToString());
+                thread_close();
+            }
         }
 
         private void thread_close()
         {
-            if (stream != null) { stream.Flush(); stream.Close(); stream = null; }
-            if (client != null) { client.Client?.Close(); client.Close(); client = null; }
+            if (stream != null)
+            {
+                stream.Flush();
+                stream.Close();
+                stream = null;
+            }
+
+            if (client != null)
+            {
+                client.Client?.Close();
+                client.Close();
+                client = null;
+            }
+
             try
             {
                 client_thread?.Abort();
@@ -148,7 +177,10 @@ namespace xLib
                     client_thread = new Thread(new ThreadStart(rx_thread));
                     client_thread.Start();
                 }
-                else { trace("tcp client: client connect error"); }
+                else
+                {
+                    trace("tcp client: client connect error");
+                }
             }
             catch (Exception ex)
             {

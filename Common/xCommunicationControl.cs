@@ -5,11 +5,11 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Media;
-using xLib.UI_Propertys;
+using xLib.UI;
 
-namespace xLib.Sources
+namespace xLib.Common
 {
-    public class xCommunicationControl : NotifyPropertyChanged
+    public class xCommunicationControl : UINotifyPropertyChanged
     {
         private Timer timer;
         private bool is_update;

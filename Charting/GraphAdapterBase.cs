@@ -7,11 +7,11 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Threading;
-using xLib;
+using xLib.Common;
 using xLib.Templates;
-using xLib.UI_Propertys;
+using xLib.UI;
 
-namespace GoniometerLib.Charting
+namespace xLib.Charting
 {
     public class GraphAdapterBase : UITemplateAdapter, INotifyPropertyChanged, IDisposable
     {

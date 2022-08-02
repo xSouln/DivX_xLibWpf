@@ -5,9 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace xLib.UI_Propertys
+namespace xLib.UI
 {
-    public abstract class NotifyPropertyChanged : INotifyPropertyChanged
+    public abstract class UINotifyPropertyChanged : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
 

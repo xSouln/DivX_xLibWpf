@@ -9,9 +9,9 @@ using System.Threading.Tasks;
 using System.Windows.Threading;
 using xLib;
 using xLib.Templates;
-using xLib.UI_Propertys;
+using xLib.UI;
 
-namespace GoniometerLib.Charting
+namespace xLib.Charting
 {
     public class PointsAdapterBase<TPoint> : GraphAdapterBase where TPoint : unmanaged
     {

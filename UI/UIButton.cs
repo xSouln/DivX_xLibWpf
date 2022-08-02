@@ -1,10 +1,10 @@
 ﻿using System.Windows;
 using System.Windows.Media;
-using xLib.UI_Propertys;
+using xLib.UI;
 
-namespace xLib.UI_Propertys
+namespace xLib.UI
 {
-    public class UI_Button : NotifyPropertyChanged
+    public class UIButton : UINotifyPropertyChanged
     {
         public string NameOn = "true";
         public string NameOff = "false";
@@ -20,9 +20,9 @@ namespace xLib.UI_Propertys
         private bool is_ignore = false;
         private Brush background;
 
-        public UI_Button() { }
+        public UIButton() { }
 
-        public UI_Button(string name_on, string name_off, Brush background_on, Brush background_off)
+        public UIButton(string name_on, string name_off, Brush background_on, Brush background_off)
         {
             if (name_on != null) { NameOn = name_on; }
             if (name_off != null) { NameOff = name_off; }
