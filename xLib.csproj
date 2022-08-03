@@ -119,6 +119,7 @@
     <Compile Include="UI\UITemplateSelectorValue.cs" />
     <Compile Include="UI\UIButton.cs" />
     <Compile Include="UI\UIProperty.cs" />
+    <Compile Include="UI\UIViewModel.cs" />
     <Compile Include="Windows\Resources\Init.cs" />
     <Compile Include="Windows\WindowConfirmation.xaml.cs">
       <DependentUpon>WindowConfirmation.xaml</DependentUpon>
@@ -130,6 +131,9 @@
     <Compile Include="Windows\WindowSerialPort.xaml.cs" />
     <Compile Include="Windows\WindowTcpConnection.xaml.cs">
       <DependentUpon>WindowTcpConnection.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\WindowUIAdapter.xaml.cs">
+      <DependentUpon>WindowUIAdapter.xaml</DependentUpon>
     </Compile>
     <Compile Include="Windows\WindowValueSetter.xaml.cs">
       <DependentUpon>WindowValueSetter.xaml</DependentUpon>
@@ -185,6 +189,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Windows\WindowTcpConnection.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Windows\WindowUIAdapter.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
